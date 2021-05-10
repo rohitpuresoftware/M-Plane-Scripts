@@ -2,6 +2,7 @@
 ##################################################
 
 if [ "x$1" == "x--server" ]; then
+    kill -9 `lsof -t -i:830`
     netopeer2-server -d -v 3
 elif [ "x$1" == "x--client" ]; then
     netopeer2-cli

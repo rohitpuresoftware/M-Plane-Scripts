@@ -23,9 +23,9 @@ fi
 
 #Basic Packages need to install.
 ###################################################
-apt-get update
+apt-get update -y
 
-apt-get install git
+apt-get install -y git
 if [[ $? > 0 ]]
 then
     echo "The git module installation failed, exiting."
@@ -34,7 +34,7 @@ else
     echo "The git module installation ran successfully, continuing with script."
 fi
 
-apt-get install cmake
+apt-get install -y cmake
 if [[ $? > 0 ]]
 then
     echo "The cmake module installation failed, exiting."
@@ -42,7 +42,7 @@ then
 else
     echo "The cmake module installation ran successfully, continuing with script."
 fi
-apt-get install build-essential 
+apt-get install -y build-essential
 if [[ $? > 0 ]]
 then
     echo "The build-essential module installation failed, exiting."
@@ -50,7 +50,7 @@ then
 else
     echo "The build-essential module installation ran successfully, continuing with script."
 fi
-apt-get install libpcre3-dev libpcre3
+apt-get install -y libpcre3-dev libpcre3
 if [[ $? > 0 ]] 
 then
     echo "The libpcre3-dev libpcre3 module installation failed, exiting."
@@ -58,7 +58,7 @@ then
 else
     echo "The libpcre3-dev libpcre3 installation ran successfully, continuing with script."
 fi
-apt-get install zlib1g-dev 
+apt-get install -y zlib1g-dev
 if [[ $? > 0 ]]
 then
     echo "The zlib1g-dev module installation failed, exiting."
@@ -66,7 +66,7 @@ then
 else
     echo "The zlib1g-dev installation ran successfully, continuing with script."
 fi
-apt-get install zlib1g
+apt-get install -y zlib1g
 if [[ $? > 0 ]]
 then
     echo "The zlib1g module installation failed, exiting."
@@ -74,7 +74,7 @@ then
 else
     echo "The zlib1g module installation ran successfully, continuing with script."
 fi
-apt-get install libssl-dev
+apt-get install -y libssl-dev
 if [[ $? > 0 ]]
 then
     echo "libssl-devmodule failed, exiting."
@@ -172,17 +172,15 @@ if [[ -z $NTPR2_SERVER ]]; then
 fi
 
 
-'''
-if [[ ! -z `sysrepoctl -l | grep aircond | cut -d " " -f 1` ]]; then
-    echo " "
-    echo "Un installing the existing yang model"
-    sysrepoctl -u aircond
-    echo "Un installed"
-fi
-'
+#if [[ ! -z `sysrepoctl -l | grep aircond | cut -d " " -f 1` ]]; then
+#    echo " "
+#    echo "Un installing the existing yang model"
+#    sysrepoctl -u aircond
+#    echo "Un installed"
+#fi
 
 echo " "
-echo "Installing aircond.yang"
+echo "Installing yang models"
 for yangfile in $NETOPEER2_WORKSPACE/netopeer2/mpra_src/yang_model/*; do
     sysrepoctl -i ${yangfile}
 done
