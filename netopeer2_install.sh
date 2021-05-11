@@ -169,6 +169,11 @@ if [[ -z $NTPR2_SERVER ]]; then
     echo "Copping rpc files in to /tmp/"
     cp ../mpra_src/user_rpcs/* /tmp/
     echo "Coppied"
+else
+    echo 7 > /proc/sys/kernel/printk
+    echo 1 > /sys/bus/pci/rescan
+    insmod /lib/modules/4.19.90-rt35/extra/yami.ko scratch_buf_size=0x20000000 scratch_buf_phys_addr=0x2360000000
+    source /usr/local/dpdk/dpaa2/dynamic_dpl.sh dpmac.5 dpmac.3
 fi
 
 
