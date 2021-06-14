@@ -91,6 +91,7 @@ echo " "
 echo " "
 git clone https://github.com/CESNET/libyang.git
 cd $PWD/libyang
+git checkout 8e9f87949974c7b2c6dc5e830c0e78e4160fbc50
 mkdir build
 cd build
 cmake ..
@@ -103,6 +104,7 @@ echo " "
 echo " "
 git clone http://git.libssh.org/projects/libssh.git
 cd $PWD/libssh
+git checkout 9b7c4307a4abccaf7fde8233de9d34daed5714f6
 mkdir build
 cd build
 cmake ..
@@ -123,6 +125,7 @@ echo " "
 echo " "
 git clone https://github.com/sysrepo/sysrepo.git
 cd $PWD/sysrepo
+git checkout 4bfd1f9236c2c6f0fe44fa01f471233e623aa7dc
 mkdir build
 cd build
 make sr_clean
@@ -138,6 +141,7 @@ echo " "
 echo " "
 git clone https://github.com/CESNET/libnetconf2.git
 cd $PWD/libnetconf2
+git checkout fa9e08da07daf5122c8a03501020463d18fec81c
 mkdir build
 cd build
 cmake ..
@@ -154,6 +158,7 @@ export NETOPEER2_WORKSPACE=$PWD
 
 git clone https://github.com/odidev/netopeer2.git
 cd $PWD/netopeer2
+git checkout d4699baef17e93180a99dd23e9f1296ac951fa35
 mkdir build
 cd build
 cmake ..
