@@ -9,6 +9,10 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+
+# Build the artifacts
+bash $PWD/netopeer2_install.sh --server
+
 rm -rf $PWD/installer/
 mkdir $PWD/installer/
 
@@ -42,5 +46,5 @@ cp -rf $PWD/netopeer2/mpra_src/yang_model/ $PWD/installer/
 # those will be packed in binary as it is.
 # Install script to be written separately
 
-tar -czvf binary_packed.tar.gz ./installer/ && rm -rf installer/* && echo "Please share the generated file 'binary_packed.tar.gz' as portable binary."
+tar -czvf binary_packed.tar.gz ./installer/ && rm -rf installer && echo "Please share the generated file 'binary_packed.tar.gz' as portable binary."
 

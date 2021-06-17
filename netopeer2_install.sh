@@ -85,13 +85,10 @@ fi
 
 ##################################################
 
-#Core Dependencies
-echo "Downloading LibYang Module.."
-echo " "
-echo " "
-git clone https://github.com/CESNET/libyang.git
+# Cloning submodules
+git submodule update --init --recursive
+
 cd $PWD/libyang
-git checkout 8e9f87949974c7b2c6dc5e830c0e78e4160fbc50
 mkdir build
 cd build
 cmake ..
@@ -99,12 +96,7 @@ make
 make install
 cd $NETOPEER2_WORKSPACE
 
-echo "Downloading LibSSH Module.."
-echo " "
-echo " "
-git clone http://git.libssh.org/projects/libssh.git
 cd $PWD/libssh
-git checkout 9b7c4307a4abccaf7fde8233de9d34daed5714f6
 mkdir build
 cd build
 cmake ..
@@ -120,12 +112,7 @@ else
     echo "Install OpenSSL on ARM processors Manually"
 fi  
 
-echo "Downloading sysrepo Module.."
-echo " "
-echo " "
-git clone https://github.com/sysrepo/sysrepo.git
 cd $PWD/sysrepo
-git checkout 4bfd1f9236c2c6f0fe44fa01f471233e623aa7dc
 mkdir build
 cd build
 make sr_clean
@@ -136,12 +123,7 @@ ldconfig
 cd $NETOPEER2_WORKSPACE
 
 
-echo "Downloading libnetconf2 Module.."
-echo " "
-echo " "
-git clone https://github.com/CESNET/libnetconf2.git
 cd $PWD/libnetconf2
-git checkout fa9e08da07daf5122c8a03501020463d18fec81c
 mkdir build
 cd build
 cmake ..
@@ -150,15 +132,7 @@ make install
 cd $NETOPEER2_WORKSPACE
 
 
-echo "Downloading neetopeer2 Module.."
-echo " "
-echo " "
-
-export NETOPEER2_WORKSPACE=$PWD
-
-git clone https://github.com/odidev/netopeer2.git
 cd $PWD/netopeer2
-git checkout d4699baef17e93180a99dd23e9f1296ac951fa35
 mkdir build
 cd build
 cmake ..
@@ -167,13 +141,10 @@ make install
 ldconfig
 
 echo " "
-echo " "
 echo "Setting up server and client installation..."
 if [[ -z $NTPR2_SERVER ]]; then
     echo " "
-    echo "Copping rpc files in to /tmp/"
-    cp ../mpra_src/user_rpcs/* /tmp/
-    echo "Coppied"
+    echo "Copping rpc/state data files in to /tmp/"
 fi
 
 
