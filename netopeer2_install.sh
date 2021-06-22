@@ -9,163 +9,149 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-if [ "x$1" == "x--server" ]; then
-    export NTPR2_SERVER=1
-elif [ "x$1" == "x--client" ]; then
-    export NTPR2_CLIENT=1
-    # Do nothing, just force user to know what he is running
+if [ "x$1" == "x--setup" ]; then
+    export SWITCH="SETUP"
+elif [ "x$1" == "x--build" ]; then
+    export SWITCH="BUILD"
 else
     echo "Incorrect First input Argument"
-        echo "To run as server please execute: ./netopeer2_install.sh --server"
-    echo "To run as client please execute: ./netopeer2_install.sh --client"
+    echo "To build: ./netopeer2_install.sh --build"
+    echo "To setup dev env: ./netopeer2_install.sh --setup"
     exit 0
 fi
+
+function install_specific_pkg()
+{
+    apt-get install -y $1
+    if [[ $? > 0 ]]; then
+        echo "The $1 module installation failed, exiting."
+        exit
+    else
+        echo "The $1 module installation ran successfully."
+	echo ""
+    fi
+}
 
 #Basic Packages need to install.
 ###################################################
 apt-get update -y
-
-apt-get install -y git
-if [[ $? > 0 ]]
-then
-    echo "The git module installation failed, exiting."
-    exit
-else
-    echo "The git module installation ran successfully, continuing with script."
-fi
-
-apt-get install -y cmake
-if [[ $? > 0 ]]
-then
-    echo "The cmake module installation failed, exiting."
-    exit
-else
-    echo "The cmake module installation ran successfully, continuing with script."
-fi
-apt-get install -y build-essential
-if [[ $? > 0 ]]
-then
-    echo "The build-essential module installation failed, exiting."
-    exit
-else
-    echo "The build-essential module installation ran successfully, continuing with script."
-fi
-apt-get install -y libpcre3-dev libpcre3
-if [[ $? > 0 ]] 
-then
-    echo "The libpcre3-dev libpcre3 module installation failed, exiting."
-    exit
-else
-    echo "The libpcre3-dev libpcre3 installation ran successfully, continuing with script."
-fi
-apt-get install -y zlib1g-dev
-if [[ $? > 0 ]]
-then
-    echo "The zlib1g-dev module installation failed, exiting."
-    exit
-else
-    echo "The zlib1g-dev installation ran successfully, continuing with script."
-fi
-apt-get install -y zlib1g
-if [[ $? > 0 ]]
-then
-    echo "The zlib1g module installation failed, exiting."
-    exit
-else
-    echo "The zlib1g module installation ran successfully, continuing with script."
-fi
-apt-get install -y libssl-dev
-if [[ $? > 0 ]]
-then
-    echo "libssl-devmodule failed, exiting."
-    exit
-else
-    echo "The libssl-dev module installation ran successfully, continuing with script."
-fi
+function install_pkgs()
+{
+    PKGS=(
+        "git"
+        "cmake"
+        "build-essential"
+        "libpcre3-dev"
+        "libpcre3"
+        "zlib1g-dev"
+        "zlib1g"
+        "libssl-dev"
+    )
+    for pkg in "${PKGS[@]}"; do
+        if [ "1" = `dpkg-query -W -f='${Status}' $pkg 2>/dev/null | grep -c "ok installed"` ];then
+            echo "$pkg already installed"
+        else
+            install_specific_pkg $pkg
+        fi
+    done
+}
 
 ##################################################
+function build_specific_submodule()
+{
+    if [ "OpenSSL" = $1 ];then
+        if [  -n "$(uname -a | grep Ubuntu)" ]; then
+            echo "OpenSSL is already present in Ubuntu. No Need to install"
+        else
+            echo "Install OpenSSL on ARM processors Manually"
+        fi
+    else
+        echo "#########################################################"
+        echo "                 Building $1"
+        echo "#########################################################"
+        cd $PWD/$1
+        mkdir build
+        cd build
+        cmake ..
+        make
+        make install
+        ldconfig
+        cd $NETOPEER2_WORKSPACE
+        echo "Done"
+        echo ""
+        echo ""
+    fi
+}
 
-# Cloning submodules
-git submodule update --init --recursive
+function build_submodules()
+{
+    #git submodule update --init --recursive
+    DEPS=(
+        "libyang"
+        "libssh"
+        "OpenSSL"
+        "sysrepo"
+        "libnetconf2"
+        "netopeer2"
+    )
+    for dep in "${DEPS[@]}"; do
+        build_specific_submodule $dep
+    done
+}
 
-cd $PWD/libyang
-mkdir build
-cd build
-cmake ..
-make
-make install
+function build_libruapp()
+{
+    cd $PWD/libruapp
+    make
+    make install
+    make objclean
+    ldconfig
+    cd $NETOPEER2_WORKSPACE
+    echo ""
+    echo ""
+}
+
+function copy_files()
+{
+    echo ""
+    mkdir -p /tmp/mplane
+    echo "Copping user-rpcs example, o-ran yang modules and state data xml files"
+    cp -r $PWD/libruapp/example /tmp/mplane/
+    cp -r $PWD/libruapp/oran_yang_model /tmp/mplane/
+    cp -r $PWD/libruapp/state_data_xml /tmp/mplane/
+    echo "Done"
+}
+
+function install_yang_modules()
+{
+    echo ""
+    echo ""
+    echo "Installing the yang oran specific yang modules"
+    ./install_yang_model.sh
+    echo "Done"
+    echo ""
+}
+
+case $SWITCH in
+    SETUP)
+        install_pkgs
+        build_submodules
+        build_libruapp
+        copy_files
+        install_yang_modules
+        ;;
+    BUILD)
+        install_pkgs
+        build_submodules
+        build_libruapp
+        ;;
+    *)
+        echo "Wrong option"
+        ;;
+esac
+
 cd $NETOPEER2_WORKSPACE
-
-cd $PWD/libssh
-mkdir build
-cd build
-cmake ..
-make
-make install
-cd $NETOPEER2_WORKSPACE
-
-echo "Downloading OpenSSL Module.."
 echo " "
-if [  -n "$(uname -a | grep Ubuntu)" ]; then
-    echo "OpenSSL is already present in Ubuntu. No Need to install" 
-else
-    echo "Install OpenSSL on ARM processors Manually"
-fi  
-
-cd $PWD/sysrepo
-mkdir build
-cd build
-make sr_clean
-cmake ..
-make
-make install
-ldconfig
-cd $NETOPEER2_WORKSPACE
-
-
-cd $PWD/libnetconf2
-mkdir build
-cd build
-cmake ..
-make
-make install
-cd $NETOPEER2_WORKSPACE
-
-
-cd $PWD/netopeer2
-mkdir build
-cd build
-cmake ..
-make
-make install
-ldconfig
-
-echo " "
-echo "Setting up server and client installation..."
-if [[ -z $NTPR2_SERVER ]]; then
-    echo " "
-    echo "Copping rpc/state data files in to /tmp/"
-fi
-
-
-#if [[ ! -z `sysrepoctl -l | grep aircond | cut -d " " -f 1` ]]; then
-#    echo " "
-#    echo "Un installing the existing yang model"
-#    sysrepoctl -u aircond
-#    echo "Un installed"
-#fi
-
-echo " "
-echo "Installing yang models"
-for yangfile in $NETOPEER2_WORKSPACE/netopeer2/mpra_src/yang_model/*; do
-    sysrepoctl -i ${yangfile}
-done
-echo "Installed"
-
-cd $NETOPEER2_WORKSPACE
-
-echo " "
-
 
 echo "#########################################################"
 echo "Netopeer2 Installation successfully."
