@@ -38,17 +38,17 @@ cd $PWD/netopeer2/build
 make install DESTDIR=$PWD/../../installer/
 cd $NETOPEER2_WORKSPACE
 
-cd $PWD/lib_ruapp
+cd $PWD/libruapp
 make
 make objclean
 cd $NETOPEER2_WORKSPACE
 
 cp -rf $PWD/bin_unpack/* $PWD/installer/
 mkdir -p $PWD/installer/mplane
-cp -rf $PWD/lib_ruapp/user_rpcs $PWD/installer/mplane
-cp -rf $PWD/lib_ruapp/oran_yang_model $PWD/installer/mplane
-cp -rf $PWD/lib_ruapp/state_data_xml $PWD/installer/mplane
-cp -rf $PWD/lib_ruapp/build $PWD/installer/mplane
+cp -rf $PWD/libruapp/user_rpcs $PWD/installer/mplane
+cp -rf $PWD/libruapp/oran_yang_model $PWD/installer/mplane
+cp -rf $PWD/libruapp/state_data_xml $PWD/installer/mplane
+cp -rf $PWD/libruapp/build $PWD/installer/mplane
 
 # Write script here to copy your files in $PWD/installer/
 # those will be packed in binary as it is.

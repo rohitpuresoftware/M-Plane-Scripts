@@ -13,6 +13,6 @@
 [submodule "libssh"]
 	path = libssh
 	url = http://git.libssh.org/projects/libssh.git
-[submodule "lib_ruapp"]
-	path = lib_ruapp
-	url = https://github.com/odidev/lib_ruapp
+[submodule "libruapp"]
+	path = libruapp
+	url = https://github.com/odidev/libruapp
