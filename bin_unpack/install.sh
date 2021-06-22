@@ -35,7 +35,7 @@ elif [ "x$1" == "x--client" ]; then
     echo "Setting up client installation..."
     cp -rf ./usr/local/bin/netopeer2-cli /usr/local/bin/netopeer2-cli
     echo "Copping rpc files in to /tmp/mplane/"
-    cp -rf ./mplane/user_rpcs /tmp/mplane/ && rm -rf ./user_rpcs/
+    cp -rf ./mplane/example /tmp/mplane/ && rm -rf ./example/
     echo "Coppied"
 else
     echo "Incorrect First input Argument"
