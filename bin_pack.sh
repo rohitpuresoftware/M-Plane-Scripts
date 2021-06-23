@@ -13,7 +13,7 @@ fi
 echo "###########################################################"
 echo "##              Building netopeer2 artifacts             ##"
 echo "###########################################################"
-bash $PWD/netopeer2_install.sh --server
+bash $PWD/netopeer2_install.sh --build
 
 echo "###########################################################"
 echo "##                Installing the artifacts               ##"
@@ -22,25 +22,25 @@ rm -rf $PWD/installer/
 mkdir $PWD/installer/
 
 cd $PWD/libyang/build
-make install DESTDIR=$PWD/../../installer/
+make install DESTDIR=$NETOPEER2_WORKSPACE/installer/
 cd $NETOPEER2_WORKSPACE
 
 cd $PWD/libssh/build
-make install DESTDIR=$PWD/../../installer/
+make install DESTDIR=$NETOPEER2_WORKSPACE/installer/
 cd $NETOPEER2_WORKSPACE
 
 cd $PWD/sysrepo/build
-make install DESTDIR=$PWD/../../installer/
+make install DESTDIR=$NETOPEER2_WORKSPACE/installer/
 cd $NETOPEER2_WORKSPACE
 
 
 cd $PWD/libnetconf2/build
-make install DESTDIR=$PWD/../../installer/
+make install DESTDIR=$NETOPEER2_WORKSPACE/installer/
 cd $NETOPEER2_WORKSPACE
 
 
 cd $PWD/netopeer2/build
-make install DESTDIR=$PWD/../../installer/
+make install DESTDIR=$NETOPEER2_WORKSPACE/installer/
 cd $NETOPEER2_WORKSPACE
 
 echo "###########################################################"
@@ -77,7 +77,7 @@ cp -rf $PWD/libruapp/build $PWD/installer/mplane
 echo "###########################################################"
 echo "##           Packaging the binrary into tar.gz           ##"
 echo "###########################################################"
-tar -czvf binary_packed.tar.gz ./installer/ && rm -rf installer &&\
+tar -czvf binary_packed.tar.gz installer && rm -rf installer &&\
 	echo "############################################################################################" &&\
 	echo "## Please share the generated file 'binary_packed.tar.gz' as portable binary              ##" &&\
 	echo "## To install, User need to untar this file and execute install.sh with --server/--client ##" &&\

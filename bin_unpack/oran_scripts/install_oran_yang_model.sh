@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-ORAN_MODULE_DIR=/usr/local/share/yang/modules/netopeer2/oran_yang_model
-#$(pwd)/netopeer2_scripts/modules/
+ORAN_MODULE_DIR=$1
 ORAN_MODULE_PERMS=600
 MODULES_OWNER=$(id -un)
 MODULES_GROUP=$(id -gn)
@@ -22,6 +21,7 @@ elif [ `id -u` -eq 0 ]; then
 else
     SYSREPOCTL=`which sysrepoctl`
 fi
+
 MODDIR=${ORAN_MODULE_DIR}
 PERMS=${ORAN_MODULE_PERMS}
 OWNER=${NP2_MODULE_OWNER}
@@ -84,6 +84,7 @@ ENABLE_FEATURE() {
 SCTL_MODULES=`$SYSREPOCTL -l`
 
 for i in "${MODULES[@]}"; do
+    echo "Installing $i"
     name=`echo "$i" | sed 's/\([^@]*\).*/\1/'`
 
     SCTL_MODULE=`echo "$SCTL_MODULES" | grep "^$name \+|[^|]*| I"`

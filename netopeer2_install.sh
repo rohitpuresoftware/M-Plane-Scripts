@@ -1,6 +1,6 @@
 #!/bin/bash
 ##################################################
-
+ORAN_MODULE_DIR=/tmp/mplane/oran_yang_model
 export NETOPEER2_WORKSPACE=$PWD
 
 if [[ $EUID -ne 0 ]]; then
@@ -127,7 +127,7 @@ function install_yang_modules()
     echo ""
     echo ""
     echo "Installing the yang oran specific yang modules"
-    ./install_yang_model.sh
+    $PWD/bin_unpack/oran_scripts/install_oran_yang_model.sh $ORAN_MODULE_DIR
     echo "Done"
     echo ""
 }
