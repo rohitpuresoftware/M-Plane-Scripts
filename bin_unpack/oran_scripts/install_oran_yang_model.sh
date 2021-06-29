@@ -39,6 +39,8 @@ MODULES=(
 "o-ran-software-management@2019-07-03.yang"
 "o-ran-operations@2020-12-10.yang"
 "mplane-rpcs@2021-06-21.yang"
+"o-ran-ald-port@2019-07-03.yang"
+"o-ran-ald@2019-07-03.yang"
 )
 
 # functions
