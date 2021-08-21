@@ -41,6 +41,8 @@ cd $NETOPEER2_WORKSPACE
 
 cd $PWD/netopeer2/build
 make install DESTDIR=$NETOPEER2_WORKSPACE/installer/
+cp $PWD/netopeer2-cli $NETOPEER2_WORKSPACE/installer/usr/local/bin/
+chmod 777 $NETOPEER2_WORKSPACE/installer/usr/local/bin/netopeer2-cli
 cd $NETOPEER2_WORKSPACE
 
 echo "###########################################################"
