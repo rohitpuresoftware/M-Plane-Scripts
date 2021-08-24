@@ -60,7 +60,6 @@ MODULES=(
 "o-ran-laa@2019-07-03.yang"
 "o-ran-software-management@2019-07-03.yang"
 "o-ran-uplane-conf@2020-12-10.yang"
-"o-ran-fan@2019-07-03.yang"
 )
 
 # functions
