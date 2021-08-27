@@ -59,7 +59,6 @@ MODULES=(
 "o-ran-uplane-conf@2020-12-10.yang"
 "o-ran-fan@2019-07-03.yang"
 "o-ran-fm@2019-02-04.yang"
-"o-ran-laa@2019-07-03.yang"
 )
 
 # functions
