@@ -91,7 +91,11 @@ function build_specific_submodule()
 
 function build_submodules()
 {
+<<<<<<< HEAD
    git submodule update --init --recursive
+=======
+   # git submodule update --init --recursive
+>>>>>>> upgraded packages to v2 devel branch & not working modifying key-less list in operational data
     DEPS=(
         "libyang"
         "libssh"
