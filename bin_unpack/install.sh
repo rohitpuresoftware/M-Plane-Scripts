@@ -27,6 +27,7 @@ if [ "x$1" == "x--server" ]; then
     echo "Installing ruapp and library"
     cp -rf $INSTALLER_DIR/mplane/build/ruapp /usr/local/bin/
     cp -rf $INSTALLER_DIR/mplane/build/libruapp.so /usr/lib/
+    cp -rf $INSTALLER_DIR/mplane/build/libruapp.so /usr/local/lib/
     echo "Running netopeer2 setup scripts"
     $INSTALLER_DIR/netopeer2_scripts/setup.sh && $INSTALLER_DIR/netopeer2_scripts/merge_hostkey.sh && $INSTALLER_DIR/netopeer2_scripts/merge_config.sh && rm -rf $INSTALLER_DIR/netopeer2_scripts
     echo "Running o-ran yang installation scripts"

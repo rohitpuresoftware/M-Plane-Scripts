@@ -5,7 +5,6 @@ NP2_MODULE_DIR=/usr/local/share/yang/modules/netopeer2
 NP2_MODULE_PERMS=600
 MODULES_OWNER=$(id -un)
 MODULES_GROUP=$(id -gn)
-
 # env variables NP2_MODULE_DIR, NP2_MODULE_PERMS must be defined and NP2_MODULE_OWNER, NP2_MODULE_GROUP will be used if
 # defined when executing this script!
 if [ -z "$NP2_MODULE_DIR" -o -z "$NP2_MODULE_PERMS" ]; then
@@ -43,12 +42,8 @@ MODULES=(
 "ietf-ssh-server@2019-07-02.yang -e local-client-auth-supported"
 "ietf-tls-server@2019-07-02.yang -e local-client-auth-supported"
 "ietf-netconf-server@2019-07-02.yang -e ssh-listen -e tls-listen -e ssh-call-home -e tls-call-home"
-"ietf-interfaces@2018-02-20.yang"
-"ietf-ip@2018-02-22.yang"
-"ietf-yang-schema-mount@2019-01-14.yang"
-"ietf-network-instance@2019-01-21.yang"
-"ietf-restconf@2017-01-26.yang"
-"ietf-subscribed-notifications@2019-09-09.yang"
+"ietf-subscribed-notifications@2019-09-09.yang -e encode-xml -e replay -e subtree -e xpath"
+"ietf-yang-push@2019-09-09.yang -e on-change"
 )
 
 # functions
