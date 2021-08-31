@@ -1,0 +1,55 @@
+module mplane-rpcs {
+    yang-version 1.1;
+    namespace "urn:m-plane:rpcs:1.0";
+    prefix "mplane-rpcs";
+
+    revision 2021-06-21 {
+        description "Initial revision.";
+    }
+
+    rpc start-ruapp{
+        output {
+            leaf status {
+                type enumeration {
+                    enum SUCCESS {
+                    value 0;
+                    description
+                        "Reserved slot number.";
+                    }
+                    enum FAILURE {
+                    value 1;
+                    description
+                        "Reserved slot number.";
+                    }
+                }
+            }
+            leaf error-message {
+                when "../status = 'FAILURE'";
+                type string;
+            }
+        }
+    }
+
+    rpc stop-ruapp {
+        output {
+            leaf status {
+                type enumeration {
+                    enum SUCCESS {
+                    value 0;
+                    description
+                        "Reserved slot number.";
+                    }
+                    enum FAILURE {
+                    value 1;
+                    description
+                        "Reserved slot number.";
+                    }
+                }
+            }
+            leaf error-message {
+                when "../status = 'FAILURE'";
+                type string;
+            }
+        }
+    }
+}

@@ -1,0 +1,13 @@
+prefix=/usr/local
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: sysrepo
+Description: YANG-based system repository for all-around configuration management.
+Version: 2.0.37
+Requires.private: libyang
+Libs: -L${libdir} -lsysrepo
+Cflags: -I${includedir}
+
+SR_REPO_PATH=/home/M-Plane-Scripts/sysrepo/build/repository
+SRPD_PLUGINS_PATH=/usr/local/lib/sysrepo/plugins

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-ORAN_MODULE_DIR=$1
-ORAN_MODULE_PERMS=600
+NP2_MODULE_DIR=/usr/local/share/yang/modules/netopeer2
+#$(pwd)/netopeer2_scripts/modules/
+NP2_MODULE_PERMS=600
 MODULES_OWNER=$(id -un)
 MODULES_GROUP=$(id -gn)
-
-# env variables ORAN_MODULE_DIR, ORAN_MODULE_PERMS must be defined and NP2_MODULE_OWNER, NP2_MODULE_GROUP will be used if
+# env variables NP2_MODULE_DIR, NP2_MODULE_PERMS must be defined and NP2_MODULE_OWNER, NP2_MODULE_GROUP will be used if
 # defined when executing this script!
-if [ -z "$ORAN_MODULE_DIR" -o -z "$ORAN_MODULE_PERMS" ]; then
+if [ -z "$NP2_MODULE_DIR" -o -z "$NP2_MODULE_PERMS" ]; then
     echo "Required environment variables not defined!"
     exit 1
 fi
@@ -21,38 +21,29 @@ elif [ `id -u` -eq 0 ]; then
 else
     SYSREPOCTL=`which sysrepoctl`
 fi
-
-MODDIR=${ORAN_MODULE_DIR}
-PERMS=${ORAN_MODULE_PERMS}
+MODDIR=${DESTDIR}${NP2_MODULE_DIR}
+PERMS=${NP2_MODULE_PERMS}
 OWNER=${NP2_MODULE_OWNER}
 GROUP=${NP2_MODULE_GROUP}
 
 # array of modules to install
 MODULES=(
-"iana-hardware.yang"
-"ietf-hardware.yang"
-"o-ran-wg4-features.yang"
-"o-ran-hardware.yang"
-"o-ran-file-management.yang"
-"o-ran-operations.yang"
-"mplane-rpcs@2021-06-21.yang"
-"o-ran-ald-port.yang"
-"o-ran-ald.yang"
-"o-ran-ves-subscribed-notifications.yang"
-"iana-if-type.yang"
-"o-ran-interfaces.yang"
-"o-ran-compression-factors.yang"
-"o-ran-module-cap.yang"
-"o-ran-troubleshooting.yang"
-"o-ran-trace.yang"
-"ietf-dhcpv6-types.yang"
-"o-ran-dhcp.yang"
-"o-ran-delay-management.yang"
-"o-ran-supervision.yang"
-"o-ran-fan.yang"
-"o-ran-sync.yang"
-"o-ran-software-management.yang"
-"o-ran-fm.yang"
+"ietf-netconf-acm@2018-02-14.yang"
+"ietf-netconf@2013-09-29.yang -e writable-running -e candidate -e rollback-on-error -e validate -e startup -e url -e xpath"
+"ietf-netconf-monitoring@2010-10-04.yang"
+"ietf-netconf-nmda@2019-01-07.yang -e origin -e with-defaults"
+"nc-notifications@2008-07-14.yang"
+"notifications@2008-07-14.yang"
+"ietf-x509-cert-to-name@2014-12-10.yang"
+"ietf-crypto-types@2019-07-02.yang"
+"ietf-keystore@2019-07-02.yang -e keystore-supported"
+"ietf-truststore@2019-07-02.yang -e truststore-supported -e x509-certificates"
+"ietf-tcp-common@2019-07-02.yang -e keepalives-supported"
+"ietf-ssh-server@2019-07-02.yang -e local-client-auth-supported"
+"ietf-tls-server@2019-07-02.yang -e local-client-auth-supported"
+"ietf-netconf-server@2019-07-02.yang -e ssh-listen -e tls-listen -e ssh-call-home -e tls-call-home"
+"ietf-subscribed-notifications@2019-09-09.yang -e encode-xml -e replay -e subtree -e xpath"
+"ietf-yang-push@2019-09-09.yang -e on-change"
 )
 
 # functions
@@ -98,7 +89,6 @@ ENABLE_FEATURE() {
 SCTL_MODULES=`$SYSREPOCTL -l`
 
 for i in "${MODULES[@]}"; do
-    echo "Installing $i"
     name=`echo "$i" | sed 's/\([^@]*\).*/\1/'`
 
     SCTL_MODULE=`echo "$SCTL_MODULES" | grep "^$name \+|[^|]*| I"`

@@ -1,0 +1,4 @@
+<file-download xmlns="urn:o-ran:file-management:1.0">
+    <local-logical-file-path>/local/file/path</local-logical-file-path>
+    <remote-file-path>/remote/location</remote-file-path>
+</file-download>
