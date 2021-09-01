@@ -1,9 +1,0 @@
-<module-capability xmlns="urn:o-ran:module-cap:1.0">
-	<ru-capabilities>
-		<ru-supported-category>CAT_A</ru-supported-category>
-		<number-of-spatial-streams>2</number-of-spatial-streams>
-		<energy-saving-by-transmission-blanks>false</energy-saving-by-transmission-blanks>
-		<dynamic-transport-delay-management-supported>false</dynamic-transport-delay-management-supported>
-	</ru-capabilities>
-</module-capability>
-

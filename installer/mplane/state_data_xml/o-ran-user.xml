@@ -1,7 +1,0 @@
-<users xmlns="urn:o-ran:user-mgmt:1.0">
-    <user>
-      <name>PS</name>
-      <password>User$123</password>
-      <enabled>true</enabled>
-    </user>
-  </users>

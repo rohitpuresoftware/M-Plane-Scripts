@@ -1,7 +1,0 @@
-<fan-tray xmlns="urn:o-ran:fan:1.0">
-    <fan-state>
-      <name>oran</name>
-      <present-and-operating>true</present-and-operating>
-    </fan-state>
-  </fan-tray>
-
