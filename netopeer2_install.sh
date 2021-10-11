@@ -38,14 +38,17 @@ apt-get update -y
 function install_pkgs()
 {
     PKGS=(
-        "git"
-        "cmake"
-        "build-essential"
-        "libpcre3-dev"
-        "libpcre3"
-        "zlib1g-dev"
-        "zlib1g"
-        "libssl-dev"
+	"git"
+	"cmake"
+	"build-essential"
+	"libpcre3-dev"
+	"libpcre3"
+	"zlib1g-dev"
+	"zlib1g"
+	"libssl-dev"
+	"openssh-client"
+	"libpcre2-8-0"
+	"libpcre2-dev"
     )
     for pkg in "${PKGS[@]}"; do
         if [ "1" = `dpkg-query -W -f='${Status}' $pkg 2>/dev/null | grep -c "ok installed"` ];then

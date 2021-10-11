@@ -1,8 +1,8 @@
 ORAN_MODULE_DIR="/usr/local/share/yang/modules/netopeer2/oran_yang_model"
 INSTALLER_DIR=$PWD
 
-apt-get update && apt-get install -y openssl libssl-dev vim python3-pip
-pip install pyang
+apt-get update && apt-get install -y openssl libssl-dev vim python3-pip libpcre2-8-0 libpcre2-dev
+pip3 install pyang
 
 echo "Copying library and headers"
 cp -rf $INSTALLER_DIR/usr/local/bin/sysrepo* /usr/local/bin/
@@ -11,6 +11,7 @@ cp -rf $INSTALLER_DIR/usr/local/include/* /usr/local/include/
 cp -rf $INSTALLER_DIR/usr/local/lib/* /usr/local/lib/
 cp -rf $INSTALLER_DIR/usr/local/include/* /usr/local/include/
 cp -rf $INSTALLER_DIR/usr/local/share/* /usr/local/share/
+cp -rf $INSTALLER_DIR/usr/local/bin/netopeer* /usr/local/bin
 
 echo "Copying oran specific yang modules"
 cp -rf $INSTALLER_DIR/mplane/oran_yang_model /usr/local/share/yang/modules/netopeer2/ && rm -rf $INSTALLER_DIR/mplane/oran_yang_model
@@ -19,7 +20,7 @@ mkdir -p /tmp/mplane
 ldconfig &> /dev/null
 
 if [ "x$1" == "x--server" ]; then
-    echo "Setting up first time server installation... (Should not be repeasted)"
+    echo "Setting up first time server installation... (Should not be repeat)"
     cp -rf $INSTALLER_DIR/usr/local/bin/netopeer2-server /usr/local/bin/netopeer2-server
     echo "Copy state data xml"
     cp -rf $INSTALLER_DIR/mplane/state_data_xml /tmp/mplane/
@@ -30,7 +31,7 @@ if [ "x$1" == "x--server" ]; then
     $INSTALLER_DIR/netopeer2_scripts/setup.sh && $INSTALLER_DIR/netopeer2_scripts/merge_hostkey.sh && $INSTALLER_DIR/netopeer2_scripts/merge_config.sh && rm -rf $INSTALLER_DIR/netopeer2_scripts
     echo "Running o-ran yang installation scripts"
     $INSTALLER_DIR/oran_scripts/install_oran_yang_model.sh $ORAN_MODULE_DIR && rm -rf $INSTALLER_DIR/oran_scripts
-	sysrepoctl -i /usr/local/share/yang/modules/netopeer2/oran_yang_model/o-ran-usermgmt\@2020-12-10.yang && sysrepocfg -W /tmp/mplane/state_data_xml/o-ran-user.xml -m o-ran-usermgmt -f "xml"
+	sysrepoctl -i /usr/local/share/yang/modules/netopeer2/oran_yang_model/o-ran-usermgmt.yang && sysrepocfg -W /tmp/mplane/state_data_xml/o-ran-user.xml -m o-ran-usermgmt -f "xml"
     #echo 7 > /proc/sys/kernel/printk
     #echo 1 > /sys/bus/pci/rescan
     #insmod /lib/modules/4.19.90-rt35/extra/yami.ko scratch_buf_size=0x20000000 scratch_buf_phys_addr=0x2360000000
