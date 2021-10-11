@@ -9,7 +9,7 @@
 	url = https://github.com/CESNET/libnetconf2.git
 [submodule "netopeer2"]
 	path = netopeer2
-	url = https://github.com/odidev/netopeer2.git
+	url = https://github.com/CESNET/netopeer2.git
 [submodule "libssh"]
 	path = libssh
 	url = http://git.libssh.org/projects/libssh.git
