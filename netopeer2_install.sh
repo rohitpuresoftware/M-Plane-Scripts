@@ -77,6 +77,9 @@ function build_specific_submodule()
         cd build
         cmake ..
         make
+	if [ "sysrepo" = $1 ];then
+	make shm_clean
+	fi
         make install
         ldconfig
         cd $NETOPEER2_WORKSPACE
