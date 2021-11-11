@@ -47,6 +47,8 @@ function install_pkgs()
         "zlib1g"
         "libssl-dev"
 	"openssh-client"
+	 "libpcre2-8-0"
+	"libpcre2-dev"
     )
     for pkg in "${PKGS[@]}"; do
         if [ "1" = `dpkg-query -W -f='${Status}' $pkg 2>/dev/null | grep -c "ok installed"` ];then
