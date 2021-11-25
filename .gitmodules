@@ -1,6 +1,6 @@
 [submodule "libyang"]
 	path = libyang
-	url = https://github.com/CESNET/libyang.git
+	url = https://github.com/chendrashekarp/libyang.git
 [submodule "sysrepo"]
 	path = sysrepo
 	url = https://github.com/sysrepo/sysrepo.git

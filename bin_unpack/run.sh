@@ -3,7 +3,7 @@ if [ "x$1" == "x--server" ]; then
    nohup netopeer2-server -d -v 3&
 elif [ "x$1" == "x--client" ]; then
     if [ "x$3" == "x" ]; then
-        netopeer2-cli
+        netopeer2-cli -t 5
     else
         netopeer2-cli $2 $3
     fi

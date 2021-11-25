@@ -77,9 +77,9 @@ function build_specific_submodule()
         cd build
         cmake ..
         make
-	if [ "sysrepo" = $1 ];then
-	make shm_clean
-	fi
+#	if [ "sysrepo" = $1 ];then
+#	make shm_clean
+#	fi
         make install
         ldconfig
         cd $NETOPEER2_WORKSPACE
@@ -91,7 +91,7 @@ function build_specific_submodule()
 
 function build_submodules()
 {
-   git submodule update --init --recursive
+   #git submodule update --init --recursive
     DEPS=(
         "libyang"
         "libssh"
@@ -121,7 +121,7 @@ function copy_files()
 {
     echo ""
     mkdir -p /tmp/mplane
-    echo "Copping user-rpcs example, o-ran yang modules and state data xml files"
+    echo "Copying user-rpcs example, o-ran yang modules and state data xml files"
     cp -r $PWD/libruapp/example /tmp/mplane/
     cp -r $PWD/libruapp/oran_yang_model /tmp/mplane/
     cp -r $PWD/libruapp/state_data_xml /tmp/mplane/
@@ -158,6 +158,12 @@ esac
 
 cd $NETOPEER2_WORKSPACE
 echo " "
+
+sysrepoctl -i libruapp/oran_yang_model/o-ran-usermgmt.yang && sysrepocfg -W libruapp/state_data_xml/o-ran-user.xml -m o-ran-usermgmt -f "xml"
+
+#sysrepoctl -i libruapp/oran_yang_model/o-ran-uplane-conf.yang && sysrepocfg -W libruapp/config_data_xml/uplane_conf.xml -m o-ran-uplane-conf -f "xml"
+
+sysrepoctl -c  o-ran-wg4-features -e STATIC-TRANSMISSION-WINDOW-CONTROL
 
 echo "#########################################################"
 echo "Netopeer2 Installation successfully."
