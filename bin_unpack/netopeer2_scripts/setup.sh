@@ -29,7 +29,7 @@ GROUP=${NP2_MODULE_GROUP}
 # array of modules to install
 MODULES=(
 "ietf-netconf-acm@2018-02-14.yang"
-"ietf-netconf@2013-09-29.yang -e writable-running -e candidate -e rollback-on-error -e validate -e startup -e url -e xpath"
+"ietf-netconf@2013-09-29.yang -e writable-running -e candidate -e rollback-on-error -e validate -e startup -e url -e xpath -e confirmed-commit"
 "ietf-netconf-monitoring@2010-10-04.yang"
 "ietf-netconf-nmda@2019-01-07.yang -e origin -e with-defaults"
 "nc-notifications@2008-07-14.yang"
@@ -42,6 +42,9 @@ MODULES=(
 "ietf-ssh-server@2019-07-02.yang -e local-client-auth-supported"
 "ietf-tls-server@2019-07-02.yang -e local-client-auth-supported"
 "ietf-netconf-server@2019-07-02.yang -e ssh-listen -e tls-listen -e ssh-call-home -e tls-call-home"
+"ietf-interfaces@2018-02-20.yang"
+"ietf-ip@2018-02-22.yang"
+"ietf-network-instance@2019-01-21.yang"
 "ietf-subscribed-notifications@2019-09-09.yang -e encode-xml -e replay -e subtree -e xpath"
 "ietf-yang-push@2019-09-09.yang -e on-change"
 )

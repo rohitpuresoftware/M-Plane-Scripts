@@ -73,13 +73,18 @@ function build_specific_submodule()
         echo "                 Building $1"
         echo "#########################################################"
         cd $PWD/$1
+#if [ "libssh" = $1 ];then
+#	cd build
+#else
         mkdir build
         cd build
+	if [ "sysrepo" = $1 ];then
+	cmake -DREPO_PATH=/opt/PureSoftware/MP_3.0/sysrepo/ ..
+	else
         cmake ..
+	fi
+#fi
         make
-#	if [ "sysrepo" = $1 ];then
-#	make shm_clean
-#	fi
         make install
         ldconfig
         cd $NETOPEER2_WORKSPACE
@@ -159,11 +164,11 @@ esac
 cd $NETOPEER2_WORKSPACE
 echo " "
 
-sysrepoctl -i libruapp/oran_yang_model/o-ran-usermgmt.yang && sysrepocfg -W libruapp/state_data_xml/o-ran-user.xml -m o-ran-usermgmt -f "xml"
+#sysrepoctl -i libruapp/oran_yang_model/o-ran-usermgmt.yang && sysrepocfg -W libruapp/state_data_xml/o-ran-user.xml -m o-ran-usermgmt -f "xml"
 
 #sysrepoctl -i libruapp/oran_yang_model/o-ran-uplane-conf.yang && sysrepocfg -W libruapp/config_data_xml/uplane_conf.xml -m o-ran-uplane-conf -f "xml"
 
-sysrepoctl -c  o-ran-wg4-features -e STATIC-TRANSMISSION-WINDOW-CONTROL
+#sysrepoctl -c  o-ran-wg4-features -e STATIC-TRANSMISSION-WINDOW-CONTROL
 
 echo "#########################################################"
 echo "Netopeer2 Installation successfully."

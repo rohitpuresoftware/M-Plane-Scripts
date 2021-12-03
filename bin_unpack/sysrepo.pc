@@ -1,0 +1,13 @@
+prefix=/usr/local
+includedir=${prefix}/include
+libdir=${prefix}/lib
+
+Name: sysrepo
+Description: YANG-based system repository for all-around configuration management.
+Version: 2.0.53
+Requires.private: libyang
+Libs: -L${libdir} -lsysrepo
+Cflags: -I${includedir}
+
+SR_REPO_PATH=/opt/PureSoftware/MP_3.0/sysrepo/
+SRPD_PLUGINS_PATH=

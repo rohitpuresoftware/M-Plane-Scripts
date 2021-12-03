@@ -7,7 +7,7 @@ all:
 clean:
 	@echo ""
 	@echo "Cleaning the project"
-	@rm -rf libnetconf2/build/ libssh/build/ netopeer2/build/ libruapp/build/ libyang/build/ sysrepo/build/
+	@rm -rf libnetconf2/build/ netopeer2/build/ libruapp/build/ libyang/build/ sysrepo/build/
 	@echo "Done"
 	@echo ""
 

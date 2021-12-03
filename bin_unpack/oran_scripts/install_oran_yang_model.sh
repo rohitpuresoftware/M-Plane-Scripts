@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-
+##!/usr/bin/env bash
+#!/bin/bash
 ORAN_MODULE_DIR=$1
 ORAN_MODULE_PERMS=600
 MODULES_OWNER=$(id -un)
@@ -66,10 +66,13 @@ MODULES=(
 "o-ran-ecpri-delay.yang"
 "o-ran-performance-management.yang"
 "o-ran-ves-subscribed-notifications.yang"	
-"o-ran-uplane-conf.yang"
 "o-ran-laa-operations.yang"
+"foxconn-system@2021-09-01.yang"
+"foxconn-sfp@2021-09-01.yang"
+"foxconn-operations@2021-09-01.yang"
 )
 
+#"o-ran-uplane-conf.yang"
 # functions
 INSTALL_MODULE() {
     CMD="'$SYSREPOCTL' -a -i $MODDIR/$1 -s '$MODDIR' -p '$PERMS' -v2"
@@ -87,6 +90,8 @@ INSTALL_MODULE() {
 }
 
 UPDATE_MODULE() {
+echo "in UPDATE_MODULE"
+
     CMD="'$SYSREPOCTL' -a -U $MODDIR/$1 -s '$MODDIR' -p '$PERMS' -v2"
     if [ ! -z ${OWNER} ]; then
         CMD="$CMD -o '$OWNER'"
@@ -112,24 +117,44 @@ ENABLE_FEATURE() {
 # get current modules
 SCTL_MODULES=`$SYSREPOCTL -l`
 
-for i in "${MODULES[@]}"; do
-    echo "Installing $i"
-    name=`echo "$i" | sed 's/\([^@]*\).*/\1/'`
 
-    SCTL_MODULE=`echo "$SCTL_MODULES" | grep "^$name \+|[^|]*| I"`
+for i in "${MODULES[@]}"; do
+
+    name=`echo "$i" | sed 's/\([^@]*\).*/\1/'`
+	
+	name=`echo ${name%%.*}`	
+	
+    SCTL_MODULE=`echo "$SCTL_MODULES" | grep "^$name \+|[^|]*| I "`
+
+    if [ ! -z "$SCTL_MODULE" ]; then
+	echo "uninstalling $name"
+	$SYSREPOCTL -u $name
+	fi
+done
+
+for j in "${MODULES[@]}"; do
+    echo "Installing $j"
+    name=`echo "$j" | sed 's/\([^@]*\).*/\1/'`
+	
+	name=`echo ${name%%.*}`	
+	
+    SCTL_MODULE=`echo "$SCTL_MODULES" | grep "^$name \+|[^|]*| I "`
+
     if [ -z "$SCTL_MODULE" ]; then
         # install module with all its features
-        INSTALL_MODULE "$i"
-        continue
+        INSTALL_MODULE "$j"
+       # continue
     fi
+	
+			
 
-    sctl_revision=`echo "$SCTL_MODULE" | sed 's/[^|]*| \([^ ]*\).*/\1/'`
-    revision=`echo "$i" | sed 's/[^@]*@\([^\.]*\).*/\1/'`
-    if [ "$sctl_revision" \< "$revision" ]; then
+#    sctl_revision=`echo "$SCTL_MODULE" | sed 's/[^|]*| \([^ ]*\).*/\1/'`
+#   revision=`echo "$i" | sed 's/[^@]*@\([^\.]*\).*/\1/'`
+#  if [ "$sctl_revision" \< "$revision" ]; then
         # update module without any features
-        file=`echo "$i" | cut -d' ' -f 1`
-        UPDATE_MODULE "$file"
-    fi
+#     file=`echo "$i" | cut -d' ' -f 1`
+#    UPDATE_MODULE "$file"
+#    fi
 
     # parse sysrepoctl features and add extra space at the end for easier matching
     sctl_features="`echo "$SCTL_MODULE" | sed 's/\([^|]*|\)\{6\}\(.*\)/\2/'` "
