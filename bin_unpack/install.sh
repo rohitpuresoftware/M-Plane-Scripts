@@ -64,6 +64,7 @@ cp -rf $PWD/usr/local/share/* $INSTALLER_SHARE
 ln -srf $INSTALLER_DIR/share/* -t /usr/local/share/
 cp -rf $PWD/usr/local/bin/netopeer* $INSTALLER_BIN
 
+
 cp -rf $PWD/mplane/build/ruapp $INSTALLER_BIN
 ln -srf $INSTALLER_DIR/bin/* -t /usr/local/bin/
 echo "Copying oran specific yang modules"
@@ -80,6 +81,7 @@ echo "Copy Config data xml"
 cp -rf $PWD/mplane/config_data_xml $INSTALLER_DIR
 echo "Installing ruapp and library"
 
+cp -rf $PWD/mplane/example $INSTALLER_DIR 
 echo "Running netopeer2 setup scripts"
 $PWD/netopeer2_scripts/setup.sh && $PWD/netopeer2_scripts/merge_hostkey.sh && $PWD/netopeer2_scripts/merge_config.sh #&& rm -rf $INSTALLER_DIR/netopeer2_scripts
 
@@ -120,57 +122,61 @@ SCTL_MODULE=`echo "$SCTL_MODULES" | grep "o-ran-delay-management"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring o-ran-delay-management"
 sysrepoctl --change o-ran-delay-management --enable-feature ADAPTIVE-RU-PROFILE
-sysrepocfg --copy-from=$CONFIG_DATA_DIR/del_mgmt.xml --module o-ran-delay-management --datastore running
+sysrepocfg --copy-from=$CONFIG_DATA_DIR/del_mgmt.xml --module o-ran-delay-management --datastore startup 
 
 fi
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "o-ran-mplane-int"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring o-ran-mplane-int"
-sysrepocfg --copy-from=$CONFIG_DATA_DIR/mplane_int.xml --module o-ran-mplane-int --datastore running
+sysrepocfg --copy-from=$CONFIG_DATA_DIR/mplane_int.xml --module o-ran-mplane-int --datastore startup 
 fi
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "ietf-interfaces"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring ietf-interfaces"
-sysrepocfg --copy-from=$CONFIG_DATA_DIR/ietf_interef.xml --module ietf-interfaces --datastore running
+sysrepocfg --copy-from=$CONFIG_DATA_DIR/ietf_interef.xml --module ietf-interfaces --datastore startup 
 fi
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "o-ran-processing-element"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring o-ran-processing-element"
-sysrepocfg --copy-from=$CONFIG_DATA_DIR/proc_el.xml --module o-ran-processing-element --datastore running
+sysrepocfg --copy-from=$CONFIG_DATA_DIR/proc_el.xml --module o-ran-processing-element --datastore startup 
 fi
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "o-ran-uplane-conf"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring o-ran-uplane-conf"
-sysrepocfg --copy-from=$CONFIG_DATA_DIR/uplane_conf.xml --module o-ran-uplane-conf --datastore running
+sysrepocfg --copy-from=$CONFIG_DATA_DIR/uplane_conf.xml --module o-ran-uplane-conf --datastore startup 
 fi
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "foxconn-sfp"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring foxconn-sfp"
-sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-sfp-rw.xml -m foxconn-sfp --datastore running
+sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-sfp-rw.xml -m foxconn-sfp --datastore startup 
 fi
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "foxconn-system"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring foxconn-system"
-sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-system-rw.xml -m  foxconn-system --datastore running
+sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-system-rw.xml -m  foxconn-system --datastore startup
 fi
 
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "foxconn-operations"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring foxconn-operations"
-sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-oper-rw.xml -m foxconn-operations --datastore running
+sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-oper-rw.xml -m foxconn-operations --datastore startup
 fi
 
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "ietf-netconf-server"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring ietf-netconf-server"
-sysrepocfg --edit=$CONFIG_DATA_DIR/ssh_callhome.xml -m ietf-netconf-server --datastore running
+sysrepocfg --edit=$CONFIG_DATA_DIR/ssh_callhome.xml -m ietf-netconf-server --datastore startup
+
+
+echo "Installation has been done , reboot the system to take effect of new installation"
+
 fi
 
 elif [ "x$1" == "x--client" ];then

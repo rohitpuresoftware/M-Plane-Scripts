@@ -23,12 +23,12 @@ rm -rf /usr/local/lib/libPS_MP.so
 
 rm -rf /usr/local/lib/pkgconfig/
 
-rm -rf /usr/local/lib/cmake/
+rm -rf /usr/local/lib/cmake
 rm -rf /dev/shm/sr*
 rm -rf /usr/local/lib/pkgconfig
 rm -rf /usr/local/lib/libsysrepo.so*
-rm -rf /usr/local/share/man/
-
+rm -rf /usr/local/share/man/*
+rm -rf /usr/local/lib/pkgconfig
 #cp libruapp/app/subscribe_oran_apis.h /usr/local/include
 
 #cp libruapp/lib/oran_apis.h /usr/local/include
