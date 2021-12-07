@@ -173,7 +173,8 @@ SCTL_MODULE=`echo "$SCTL_MODULES" | grep "ietf-netconf-server"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring ietf-netconf-server"
 sysrepocfg --edit=$CONFIG_DATA_DIR/ssh_callhome.xml -m ietf-netconf-server --datastore startup
-
+echo "copying startup data to running data"
+sysrepocfg -C startup
 
 echo "Installation has been done , reboot the system to take effect of new installation"
 
