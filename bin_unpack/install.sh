@@ -15,7 +15,6 @@ rm $INSTALLER_DIR/installation_log.txt
 
 fi
 
-if [ "x$1" == "x--server" ]; then
 
 	$PWD/uninstall.sh
 	if [ ! -d "/opt/PureSoftware/MP_3.0/yang_models" ] ;then
@@ -176,8 +175,12 @@ sysrepocfg --edit=$CONFIG_DATA_DIR/ssh_callhome.xml -m ietf-netconf-server --dat
 echo "copying startup data to running data"
 sysrepocfg -C startup
 
-echo "Installation has been done , reboot the system to take effect of new installation"
+echo "Installation has been done "
 
+if [ "x$1" == "x--server" ]; then
+
+cp -rf $PWD/usr/local/bin/netopeer2-server $INSTALLER_BIN
+ln -srf $INSTALLER_DIR/bin/netopeer2-server /usr/local/bin/
 fi
 
 elif [ "x$1" == "x--client" ];then
