@@ -149,25 +149,6 @@ echo "configuring o-ran-uplane-conf"
 sysrepocfg --copy-from=$CONFIG_DATA_DIR/uplane_conf.xml --module o-ran-uplane-conf --datastore startup 
 fi
 
-SCTL_MODULE=`echo "$SCTL_MODULES" | grep "foxconn-sfp"`
-if [ ! -z "$SCTL_MODULE" ];then
-echo "configuring foxconn-sfp"
-sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-sfp-rw.xml -m foxconn-sfp --datastore startup 
-fi
-
-SCTL_MODULE=`echo "$SCTL_MODULES" | grep "foxconn-system"`
-if [ ! -z "$SCTL_MODULE" ];then
-echo "configuring foxconn-system"
-sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-system-rw.xml -m  foxconn-system --datastore startup
-fi
-
-
-SCTL_MODULE=`echo "$SCTL_MODULES" | grep "foxconn-operations"`
-if [ ! -z "$SCTL_MODULE" ];then
-echo "configuring foxconn-operations"
-sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-oper-rw.xml -m foxconn-operations --datastore startup
-fi
-
 SCTL_MODULE=`echo "$SCTL_MODULES" | grep "ietf-netconf-server"`
 if [ ! -z "$SCTL_MODULE" ];then
 echo "configuring ietf-netconf-server"

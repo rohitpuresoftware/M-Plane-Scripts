@@ -67,9 +67,6 @@ MODULES=(
 "o-ran-performance-management.yang"
 "o-ran-ves-subscribed-notifications.yang"	
 "o-ran-laa-operations.yang"
-"foxconn-system@2021-09-01.yang"
-"foxconn-sfp@2021-09-01.yang"
-"foxconn-operations@2021-09-01.yang"
 )
 
 #"o-ran-uplane-conf.yang"
