@@ -80,6 +80,8 @@ echo "Installing ruapp and library"
 cp -rf $PWD/usr/local/lib/tsize.sh /usr/local/bin/
 
 export SYSREPOCTL_EXECUTABLE=`which sysrepoctl`
+export SYSREPOCFG_EXECUTABLE=`which sysrepocfg`
+export OPENSSL_EXECUTABLE=`which openssl`
 
 cp -rf $PWD/mplane/example $INSTALLER_DIR 
 echo "Running netopeer2 setup scripts"

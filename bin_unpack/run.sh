@@ -4,7 +4,7 @@ INSTALLER_LIB=$INSTALLER_DIR/lib/
 
 export PATH="$PATH:$INSTALLER_BIN"
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$INSTALLER_LIB"
-
+echo $PATH
 
 if [ "x$1" == "x--server" ]; then
     kill -9 `lsof -t -i:830`
