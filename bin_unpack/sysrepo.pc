@@ -9,5 +9,5 @@ Requires.private: libyang
 Libs: -L${libdir} -lsysrepo
 Cflags: -I${includedir}
 
-SR_REPO_PATH=/opt/PureSoftware/MP_3.0/sysrepo/
+SR_REPO_PATH=/home/user/PureSoftware/MP_3.0/sysrepo
 SRPD_PLUGINS_PATH=

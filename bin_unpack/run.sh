@@ -1,3 +1,11 @@
+INSTALLER_DIR="/home/user/PureSoftware/MP_3.0"
+INSTALLER_BIN=$INSTALLER_DIR/bin/
+INSTALLER_LIB=$INSTALLER_DIR/lib/
+
+export PATH="$PATH:$INSTALLER_BIN"
+export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$INSTALLER_LIB"
+
+
 if [ "x$1" == "x--server" ]; then
     kill -9 `lsof -t -i:830`
    nohup netopeer2-server -d -v 3&

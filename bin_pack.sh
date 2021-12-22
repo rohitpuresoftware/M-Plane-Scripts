@@ -73,7 +73,7 @@ echo "###########################################################"
 cp -rf $PWD/libruapp/build $PWD/$RELEASE_PACKAGE/mplane
 cp -rf $PWD/libruapp/lib/*.h $PWD/$RELEASE_PACKAGE/usr/local/include/
 cp -rf $PWD/libruapp/app/*.h $PWD/$RELEASE_PACKAGE/usr/local/include/
-
+cp -rf $PWD/lib/* $PWD/$RELEASE_PACKAGE/usr/local/lib/
 # Write script here to copy your files in $PWD/$RELEASE_PACKAGE/
 # those will be packed in binary as it is.
 # Install script to be written separately
