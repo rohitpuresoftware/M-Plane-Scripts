@@ -96,7 +96,6 @@ function build_specific_submodule()
 
 function build_submodules()
 {
-   git submodule update --init --recursive
     DEPS=(
         "libyang"
         "libssh"

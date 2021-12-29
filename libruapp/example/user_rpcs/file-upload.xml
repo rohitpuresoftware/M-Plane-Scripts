@@ -1,0 +1,7 @@
+<file-upload xmlns="urn:o-ran:file-management:1.0">
+        <local-logical-file-path>/home/binary_packed.tar.gz</local-logical-file-path>
+        <remote-file-path>sftp://chandras@192.168.2.137:22/ftp</remote-file-path>
+        <password>
+        <password>chandras</password>
+        </password>
+</file-upload>

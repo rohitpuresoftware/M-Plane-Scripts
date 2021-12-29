@@ -1,0 +1,14 @@
+<software-inventory xmlns="urn:o-ran:software-management:1.0">
+   <software-slot>
+     <name>SOFTWARE_SLOT1_RUNNING</name>
+     <status>VALID</status>
+     <active>false</active>
+     <running>false</running>
+     <access>READ_WRITE</access>
+     <product-code>HPRU</product-code>
+     <vendor-code>SW</vendor-code>
+     <build-id>sw</build-id>
+     <build-name>sunwave crossfire</build-name>
+     <build-version>V1.0</build-version>
+   </software-slot>
+</software-inventory>
