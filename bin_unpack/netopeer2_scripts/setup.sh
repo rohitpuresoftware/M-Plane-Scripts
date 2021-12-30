@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NP2_MODULE_DIR=/usr/local/share/yang/modules/netopeer2
+NP2_MODULE_DIR="/home/user/PureSoftware/MP_3.0/share/yang/modules/netopeer2/"
 #$(pwd)/netopeer2_scripts/modules/
 NP2_MODULE_PERMS=600
 MODULES_OWNER=$(id -un)

@@ -1,0 +1,17 @@
+<delay-management xmlns="urn:o-ran:delay:1.0">
+	<bandwidth-scs-delay-state>
+		<bandwidth>400000</bandwidth>
+		<subcarrier-spacing>120000</subcarrier-spacing>
+	</bandwidth-scs-delay-state>
+	<adaptive-delay-configuration>
+		<bandwidth-scs-delay-state>
+			<bandwidth>400000</bandwidth>
+                        <subcarrier-spacing>120000</subcarrier-spacing>
+		        <o-du-delay-profile>
+				<t1a-max-up>50000</t1a-max-up>				
+				<ta4-max>45000</ta4-max>				
+       				<t1a-max-cp-dl>100000</t1a-max-cp-dl>
+			</o-du-delay-profile>
+		</bandwidth-scs-delay-state>		
+	</adaptive-delay-configuration>
+</delay-management>

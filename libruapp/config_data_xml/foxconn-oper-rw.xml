@@ -1,0 +1,4 @@
+<oper-config xmlns="urn:foxconn:operations:1.0">
+	<alarm-info-option>without-status-info</alarm-info-option>
+	<data-report-period>OFF</data-report-period>
+</oper-config>

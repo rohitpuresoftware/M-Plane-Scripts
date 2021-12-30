@@ -1,0 +1,211 @@
+module foxconn-sfp {
+  yang-version 1.1;
+  namespace "urn:foxconn:sfp:1.0";
+  prefix "foxconn-sfp";
+
+  organization "FOXCONN";
+
+  description
+    "This module defines sfp information.";
+
+  revision "2021-09-01" {
+    description
+      "Initial revision.";
+  }
+
+  typedef sensor-status {
+    type enumeration {
+      enum alarm {
+        value 0;
+        description
+          "Indicates that the server can‘t obtain the sensor value.";
+      }
+      enum normal {
+        value 1;
+        description
+          "Indicates that the server can obtain the sensor value.";
+      }
+    }
+    description "";
+  }
+
+grouping sfp-group{
+  list sfp-list {
+    key "sfp-id";
+    
+    uses sfp-list;
+  }
+}
+
+grouping sfp-list{
+    leaf sfp-id {
+      type string;
+      config true;
+      description "";
+    }
+
+    leaf equip {
+      type string;
+      config false;
+      description "";
+    }
+
+    leaf pd-power {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      config false;
+      description "unit is dBm";
+    }
+
+    leaf ld-power {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      config false;
+      description "unit is dBm";
+    }
+
+    leaf temp {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      config false;
+      description "";
+    }
+
+    uses status-group;
+    uses alarm-limit-group;
+    uses alarm-mask-group;
+}
+
+grouping status-group {
+  container status {
+    config false;
+
+    leaf equip-light {
+      type sensor-status;
+      default normal;
+      description "";
+    }
+
+    leaf pd-power-light {
+      type sensor-status;
+      default normal;
+      description "";
+    }
+
+    leaf ld-power-light {
+      type sensor-status;
+      default normal;
+      description "";
+    }
+
+    leaf temp-status {
+      type sensor-status;
+      default normal;
+      description "";
+    }
+
+    leaf ld-status {
+      type sensor-status;
+      default normal;
+      description "";
+    }
+
+    leaf lof-status {
+      type sensor-status;
+      default normal;
+      description "";
+    }
+
+    leaf los-status {
+      type sensor-status;
+      default normal;
+      description "";
+    }
+  }
+}
+
+grouping alarm-limit-group {
+  container alarm-limit{
+    config true;
+
+    leaf pd-low-power-limit {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      default -10;
+      description "unit is dBm";
+    }
+
+    leaf ld-low-power-limit {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      default -8;
+      description "unit is dBm";
+    }
+
+    leaf temp-high-limit {
+      type decimal64 {
+        fraction-digits 6;
+      }
+      default 70;
+      description "";
+    }
+  }
+}
+
+grouping alarm-mask-group {
+  container alarm-mask {
+    config true;
+    
+    leaf equip {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf pd-power {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf ld-power {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf temp {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf ld {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf lof {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf los {
+      type boolean;
+      default false;
+      description "";
+    }
+  }
+}
+
+  container sfp-info {
+    uses sfp-group;  
+  }
+}

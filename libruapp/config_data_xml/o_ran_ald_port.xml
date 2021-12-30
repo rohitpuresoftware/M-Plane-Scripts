@@ -1,0 +1,7 @@
+<ald-ports-io xmlns="urn:o-ran:ald-port:1.0">
+  <ald-port>
+    <name>ALD_PORT1</name>
+    <port-id>4</port-id>
+  </ald-port>
+</ald-ports-io>
+

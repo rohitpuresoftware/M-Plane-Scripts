@@ -1,0 +1,19 @@
+<sfp-info xmlns="urn:foxconn:sfp:1.0">
+    <sfp-list>
+	<sfp-id>fc_sfp1</sfp-id>
+	<alarm-limit>
+		<pd-low-power-limit>-12</pd-low-power-limit>
+		<ld-low-power-limit>-4</ld-low-power-limit>
+		<temp-high-limit>80</temp-high-limit>
+	</alarm-limit>
+	<alarm-mask>
+		<equip>false</equip>
+		<pd-power>false</pd-power>
+		<ld-power>false</ld-power>
+		<temp>false</temp>
+		<ld>false</ld>
+		<lof>false</lof>
+		<los>false</los>
+	</alarm-mask>
+    </sfp-list>
+</sfp-info>

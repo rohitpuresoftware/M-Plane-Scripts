@@ -1,0 +1,4 @@
+<retrieve-file-list xmlns="urn:o-ran:file-management:1.0">
+    <logical-path>/home/M-Plane-Scripts/libruapp/oran_yang_model</logical-path>
+    <file-name-filter></file-name-filter>
+</retrieve-file-list>

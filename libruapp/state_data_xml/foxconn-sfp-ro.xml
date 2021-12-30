@@ -1,0 +1,19 @@
+<sfp-info xmlns="urn:foxconn:sfp:1.0">
+    <sfp-list>
+      <sfp-id>fc_sfp1</sfp-id>
+      <equip>none</equip>
+      <pd-power>-0.6</pd-power>
+      <ld-power>-0.4</ld-power>
+      <temp>33</temp>
+      <status>
+        <equip-light>alarm</equip-light>
+        <pd-power-light>alarm</pd-power-light>
+        <ld-power-light>alarm</ld-power-light>
+        <temp-status>alarm</temp-status>
+        <ld-status>alarm</ld-status>
+        <lof-status>alarm</lof-status>
+        <los-status>alarm</los-status>
+      </status>
+    </sfp-list>
+</sfp-info>
+

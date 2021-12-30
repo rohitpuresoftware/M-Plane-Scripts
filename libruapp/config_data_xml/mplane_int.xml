@@ -1,0 +1,28 @@
+<mplane-info xmlns="urn:o-ran:mplane-interfaces:1.0">
+	<searchable-mplane-access-vlans-info>
+		<searchable-access-vlans>1
+			<!-- # entries: 0.. -->
+		</searchable-access-vlans>
+
+		<searchable-access-vlans>2
+                        <!-- # entries: 0.. -->
+		</searchable-access-vlans>
+	
+		<vlan-range>
+			<lowest-vlan-id>1</lowest-vlan-id>
+			<highest-vlan-id>2</highest-vlan-id>
+		</vlan-range>
+	
+	</searchable-mplane-access-vlans-info>
+
+		<m-plane-interfaces>
+			<m-plane-ssh-ports>
+				<call-home-ssh-port>4334</call-home-ssh-port>
+				<server-ssh-port>830</server-ssh-port>
+			</m-plane-ssh-ports>
+			<m-plane-tls-ports>
+				<call-home-tls-port>4335</call-home-tls-port>
+				<server-tls-port>6513</server-tls-port>
+			</m-plane-tls-ports>
+		</m-plane-interfaces>
+</mplane-info>

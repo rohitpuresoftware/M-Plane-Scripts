@@ -1,0 +1,189 @@
+<user-plane-configuration xmlns="urn:o-ran:uplane-conf:1.0">
+	<low-level-tx-links>
+		<name>ps_txlink1</name>
+      		<processing-element>ps_ru_element_eth0_c</processing-element>	<!-- added -->
+      		<tx-array-carrier>ps_txarraycarrier1</tx-array-carrier>
+      		<low-level-tx-endpoint>ps_txendpoint1</low-level-tx-endpoint>
+    	</low-level-tx-links>
+        <low-level-rx-links>
+      		<name>ps_rxlink1</name>
+      		<processing-element>ps_ru_element_eth0_c</processing-element>
+      		<rx-array-carrier>ps_rxarraycarrier1</rx-array-carrier>
+      		<low-level-rx-endpoint>ps_rxendpoint1</low-level-rx-endpoint>
+      		<user-plane-uplink-marking>ps_upmarking1</user-plane-uplink-marking>
+    	</low-level-rx-links>	
+    	<low-level-tx-endpoints>
+      		<name>ps_txendpoint1</name>
+      		<compression>
+        		<iq-bitwidth>16</iq-bitwidth>
+        		<compression-type>STATIC</compression-type>
+	      	</compression>
+	      	<frame-structure>195</frame-structure>
+		<cp-length>14</cp-length>
+		<cp-length-other>0</cp-length-other>
+		<offset-to-absolute-frequency-center>1</offset-to-absolute-frequency-center>
+	      	<number-of-prb-per-scs>
+		        <scs>KHZ_120</scs>
+		      	<number-of-prb>256</number-of-prb>	
+	      	</number-of-prb-per-scs>
+      		<e-axcid>
+        		<o-du-port-bitmask>15</o-du-port-bitmask>
+                       	<band-sector-bitmask>240</band-sector-bitmask>
+               	        <ccid-bitmask>3840</ccid-bitmask>
+       	                <ru-port-bitmask>61440</ru-port-bitmask>
+			<eaxc-id>0</eaxc-id>
+      		</e-axcid>
+			<!--
+			<configurable-tdd-pattern-supported>TRUE</configurable-tdd-pattern-supported>  -->
+    	</low-level-tx-endpoints>
+   	<low-level-rx-endpoints>
+	      	<name>ps_rxendpoint1</name>
+	      	<compression>
+			<iq-bitwidth>16</iq-bitwidth>
+		        <compression-type>STATIC</compression-type>		         
+		</compression>
+      		<frame-structure>195</frame-structure>      	
+    		<cp-type>NORMAL</cp-type>
+		<cp-length>14</cp-length>
+		<cp-length-other>0</cp-length-other>
+		<offset-to-absolute-frequency-center>1</offset-to-absolute-frequency-center> 
+      		<number-of-prb-per-scs>
+        		<scs>KHZ_120</scs>
+        		<number-of-prb>256</number-of-prb>
+      		</number-of-prb-per-scs>
+      		<ul-fft-sampling-offsets>
+        		<scs>KHZ_120</scs>
+        		<ul-fft-sampling-offset>0</ul-fft-sampling-offset>
+      		</ul-fft-sampling-offsets>
+      		<e-axcid>
+        		<o-du-port-bitmask>15</o-du-port-bitmask>
+        		<band-sector-bitmask>240</band-sector-bitmask>
+        		<ccid-bitmask>3840</ccid-bitmask>
+        		<ru-port-bitmask>61440</ru-port-bitmask>
+			<eaxc-id>0</eaxc-id>
+      		</e-axcid>
+      		
+			<!--	<static-config-supported/> 
+      		<static-prach-configuration/>
+			<static-srs-configuration/> 
+			<configurable-tdd-pattern-supported>TRUE</configurable-tdd-pattern-supported>  
+      		<transmission-window-schedule/>
+			<transmission-type/>	-->
+    	</low-level-rx-endpoints>
+    	<tx-array-carriers>
+      		<name>ps_txarraycarrier1</name>
+      		
+      		<center-of-channel-bandwidth>27968160000</center-of-channel-bandwidth>
+      		<channel-bandwidth>400000000</channel-bandwidth>
+      		
+      		<type>NR</type>
+		<gain>25</gain>	
+      		<rw-duplex-scheme>TDD</rw-duplex-scheme>
+      		      		<downlink-radio-frame-offset>0</downlink-radio-frame-offset>
+		<downlink-sfn-offset>0</downlink-sfn-offset>
+		<!--      		<laa-carrier-configuration>
+				<tx-antenna-ports>2</tx-antenna-ports>
+			
+        		<transmission-power-for-drs/>
+        		<dmtc-period/>
+        		<dmtc-offset/>
+        		<lbt-timer/>
+        		<max-cw-usage-counter>
+          			<priority/>
+          			<counter-value/>
+				</max-cw-usage-counter>
+			
+		</laa-carrier-configuration>	-->
+      		
+    	</tx-array-carriers>
+    	<rx-array-carriers>
+		<name>ps_rxarraycarrier1</name>
+      		
+      		<center-of-channel-bandwidth>27968160000</center-of-channel-bandwidth>
+      		<channel-bandwidth>40000000</channel-bandwidth>
+      		
+      		<type>NR</type>
+      
+      		<downlink-radio-frame-offset>0</downlink-radio-frame-offset>
+                <downlink-sfn-offset>0</downlink-sfn-offset>
+
+      		
+		<gain-correction>0</gain-correction>
+		<n-ta-offset>1</n-ta-offset>
+			<!--	<configurable-tdd-pattern>TRUE</configurable-tdd-pattern> -->
+	</rx-array-carriers>	
+    	<static-prach-configurations>
+		<static-prach-config-id>81</static-prach-config-id>
+      		<pattern-period>1</pattern-period>
+      		<guard-tone-low-re>1</guard-tone-low-re>
+      		<num-prach-re>1</num-prach-re>
+      		<guard-tone-high-re>1</guard-tone-high-re>
+      		<sequence-duration>256</sequence-duration>
+      		<prach-patterns>
+        		<prach-pattern-id>1</prach-pattern-id>
+        		<number-of-repetitions>1</number-of-repetitions>
+        		<number-of-occasions>1</number-of-occasions>
+        		<re-offset>1</re-offset>
+        		<occasion-parameters>
+				<occasion-id>2</occasion-id>
+				<cp-length>15</cp-length>
+          			<gp-length>3</gp-length>
+				<beam-id>1</beam-id>
+			</occasion-parameters>
+			<occasion-parameters>
+				<occasion-id>1</occasion-id>
+				<cp-length>14</cp-length>
+          			<gp-length>2</gp-length>
+                               <beam-id>2</beam-id>
+        		</occasion-parameters>
+        		<frame-number>99</frame-number>
+        		<sub-frame-id>1</sub-frame-id>
+        		<time-offset>10</time-offset>
+      		</prach-patterns>
+			</static-prach-configurations>
+		
+	<static-srs-configurations>      
+		<static-srs-config-id>1</static-srs-config-id>
+		<pattern-period>1</pattern-period>
+		<srs-patterns>
+			<slot-id>1</slot-id>
+			<sub-frame-id>1</sub-frame-id>
+        		<srs-pattern-id>0</srs-pattern-id>        		        		
+        		<start-symbol-id>0</start-symbol-id>
+       	 		<beam-id>1</beam-id>
+        		<num-symbol>14</num-symbol>
+        		<start-prbc>0</start-prbc>
+        		<num-prbc>132</num-prbc>
+		</srs-patterns>
+		<srs-patterns>
+			<slot-id>1</slot-id>
+                        <sub-frame-id>1</sub-frame-id>
+                        <srs-pattern-id>1</srs-pattern-id>                                                
+                        <start-symbol-id>0</start-symbol-id>
+                        <beam-id>2</beam-id>
+                        <num-symbol>14</num-symbol>
+                        <start-prbc>132</start-prbc>
+                        <num-prbc>132</num-prbc>
+                </srs-patterns>
+	</static-srs-configurations>
+			
+    	<configurable-tdd-patterns>
+		<tdd-pattern-id>1</tdd-pattern-id>
+		<switching-points>
+			<switching-point-id>202</switching-point-id>
+			<direction>DL</direction>
+			<frame-offset>0</frame-offset>
+		</switching-points>
+		<switching-points>
+			<switching-point-id>206</switching-point-id>
+			<direction>GP</direction>
+			<frame-offset>0</frame-offset>
+		</switching-points>
+		<switching-points>
+			<switching-point-id>280</switching-point-id>
+			<direction>UL</direction>
+			<frame-offset>0</frame-offset>
+		</switching-points>
+	</configurable-tdd-patterns>
+    	<general-config/>
+</user-plane-configuration>

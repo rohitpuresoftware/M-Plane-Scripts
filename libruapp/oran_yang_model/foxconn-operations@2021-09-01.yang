@@ -1,0 +1,124 @@
+module foxconn-operations {
+  yang-version 1.1;
+  namespace "urn:foxconn:operations:1.0";
+  prefix "foxconn-operations";
+  
+  import foxconn-system {
+    prefix fsystem;
+  }
+
+  import foxconn-sfp {
+    prefix fsfp;
+  }
+
+  organization "FOXCONN";
+
+  description
+    "This module defines system operations.";
+
+  revision "2021-09-01" {
+    description
+      "Initial revision.";
+  }
+
+  container oper-config {
+    
+    leaf alarm-info-option {
+      type enumeration {
+        enum without-status-info {
+          value 0;
+        }
+        enum with-status-info {
+          value 1;
+        }
+      }
+      config true;
+      default without-status-info;
+      description "Without Status Info / With Status Info";
+    }
+
+    leaf data-report-period {
+      type enumeration {
+        enum OFF {
+          value 0;
+        }
+        enum 1m {
+          value 1;
+        }
+        enum 10m {
+          value 2;
+        }
+        enum 30m {
+          value 3;
+        }
+        enum 60m {
+          value 4;
+        }
+      }
+      config true;
+      default OFF;
+      description "";
+    }
+  }
+
+  rpc led-test {
+    description "led test";
+  }
+
+  rpc trigger-data-send-to-rms {
+    description "trigger the notification timer send data immediately";
+  }
+
+  notification system-notif {
+
+    container system {
+      uses fsystem:system;
+      uses fsystem:mplane-network-group;
+      uses fsystem:mplane-client-group;
+      uses fsystem:sensor-status;
+      uses fsystem:alarm-mask-group;
+      uses fsystem:hardware-group;
+      uses fsystem:sync-group;
+    }
+
+    container sfp-info{
+      uses fsfp:sfp-group;
+    }
+
+    container oper-config {
+      
+      leaf alarm-info-option {
+        type enumeration {
+          enum without-status-info {
+            value 0;
+          }
+          enum with-status-info {
+            value 1;
+          }
+        }
+      }
+
+      leaf data-report-period {
+        type enumeration {
+          enum OFF {
+            value 0;
+          }
+          enum 1m {
+            value 1;
+          }
+          enum 10m {
+            value 2;
+          }
+          enum 30m {
+            value 3;
+          }
+          enum 60m {
+            value 4;
+          }
+        }
+      }
+    }
+
+    description "notif all information";
+  }
+}

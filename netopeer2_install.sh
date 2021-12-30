@@ -79,7 +79,7 @@ function build_specific_submodule()
         mkdir build
         cd build
 	if [ "sysrepo" = $1 ];then
-	cmake -DREPO_PATH=/opt/PureSoftware/MP_3.0/sysrepo/ ..
+	cmake -DREPO_PATH=/home/user/PureSoftware/MP_3.0/sysrepo/ ..
 	else
         cmake ..
 	fi
@@ -96,7 +96,6 @@ function build_specific_submodule()
 
 function build_submodules()
 {
-   git submodule update --init --recursive
     DEPS=(
         "libyang"
         "libssh"

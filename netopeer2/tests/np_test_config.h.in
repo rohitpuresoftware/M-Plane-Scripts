@@ -1,0 +1,55 @@
+/**
+ * @file np_test_config.h
+ * @author Michal Vasko <mvasko@cesnet.cz>
+ * @brief test configuration header
+ *
+ * @copyright
+ * Copyright (c) 2019 - 2021 Deutsche Telekom AG.
+ * Copyright (c) 2017 - 2021 CESNET, z.s.p.o.
+ *
+ * This source code is licensed under BSD 3-Clause License (the "License").
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://opensource.org/licenses/BSD-3-Clause
+ */
+#ifndef _NP_TEST_CONFIG_H_
+#define _NP_TEST_CONFIG_H_
+
+/* repository root dir */
+#define NP_ROOT_DIR "@ROOT_DIR@"
+
+/* binary dir */
+#define NP_BINARY_DIR "@PROJECT_BINARY_DIR@"
+
+/* sysrepo test repository */
+#define NP_SR_REPOS_DIR "@CMAKE_CURRENT_BINARY_DIR@/repositories"
+
+/* directory with test YANG modules */
+#define NP_TEST_MODULE_DIR "@CMAKE_CURRENT_SOURCE_DIR@/modules"
+
+/* sysrepo SHM prefix */
+#define NP_SR_SHM_PREFIX "_tests_np_"
+
+/* path to put test-specific directory into, just relative NP_SR_REPOS_DIR to NP_BINARY_DIR */
+#define NP_TEST_DIR "./tests/repositories"
+
+/* server PID file */
+#define NP_PID_FILE "np2.pid"
+
+/* server socket path */
+#define NP_SOCKET_FILE "np2.sock"
+
+/* server log file */
+#define NP_LOG_FILE "np2.log"
+
+/* NACM recovery UID */
+#define NACM_RECOVERY_UID "@NACM_RECOVERY_UID@"
+
+/** @brief diretory for server backup files */
+#define NP2SRV_TEST_DIR NP_TEST_DIR "/netopeer2_server_files"
+
+/** @brief diretory for server backup files for confirmed commit */
+#define NCC_TEST_DIR NP2SRV_TEST_DIR "/confirmed_commit"
+
+#endif /* _NP_TEST_CONFIG_H_ */

@@ -1,0 +1,370 @@
+module foxconn-system {
+  yang-version 1.1;
+  namespace "urn:foxconn:system:1.0";
+  prefix "foxconn-system";
+  
+  import ietf-yang-types {
+    prefix yang;
+  }
+
+  organization "FOXCONN";
+
+  description
+    "This module defines system information.";
+
+  revision "2021-09-01" {
+    description
+      "Initial revision.";
+  }
+
+  typedef sensor-status {
+    type enumeration {
+      enum alarm {
+        description
+          "Indicates that the server can‘t obtain the sensor value.";
+      }
+      enum normal {
+        description
+          "Indicates that the server can obtain the sensor value.";
+      }
+    }
+    description "";
+  }
+
+  grouping system{
+    leaf temperature {
+      type decimal64{
+        fraction-digits 4;
+      }
+      config false;
+      description
+        "Measured temperature in degrees celcius";
+    }
+
+    leaf temperature-alarm-limit {
+      type decimal64{
+        fraction-digits 4;
+      }      
+      config true;
+      default 65;
+      description
+        "A alarm will notif when the temperature is larger than this limit.";
+    }
+
+    leaf fan-duty-circle {
+      type enumeration {
+          enum OFF {
+            description "";
+          }
+          enum AUTO {
+            description "";
+          }
+          enum 100 {
+            description "100%";
+          }
+          enum 75 {
+            description "75%";
+          }
+          enum 50 {
+            description "50%";
+          }
+          enum 25 {
+            description "25%";
+          }
+      }
+      config true;
+      default OFF;
+      description "";
+    }
+
+    leaf fan-speed {
+      type int32;
+      config false;
+      description "unit is %";
+    }
+
+    leaf log-control-count {
+      type int32;
+      config false;
+      description "";
+    }
+
+    leaf log-alarm-count {
+      type int32;
+      config false;
+      description "";
+    }
+
+    leaf ru-install-location {
+      type string;
+      config true;
+      description "";
+    }
+
+    leaf startup-time {
+      type yang:date-and-time;
+      config false;
+      description 
+        "yyyy-MM-ddTHH:mm:ssZ or yyyy-MM-ddTHH:mm:ss+08:00";
+    }
+
+    leaf real-time {
+      type yang:date-and-time;
+      config false;
+      description 
+        "yyyy-MM-ddTHH:mm:ssZ or yyyy-MM-ddTHH:mm:ss+08:00";
+    }
+
+    leaf time-setting {
+      type yang:date-and-time;
+      config true;
+      description 
+        "yyyy-MM-ddTHH:mm:ssZ or yyyy-MM-ddTHH:mm:ss+08:00";
+    }
+  }
+
+grouping mplane-network-group {
+  container interface-status {
+    config false;
+
+    leaf host {
+      type string;
+      description "";
+    }
+
+    leaf gateway {
+      type string;
+      description "";
+    }
+
+    leaf subnet-mask {
+      type string;
+      description "";
+    }
+  }
+
+  container interface-settings {
+    config true;
+
+    leaf host {
+      type string;
+      description "";
+    }
+
+    leaf gateway {
+      type string;
+      description "";
+    }
+
+    leaf subnet-mask {
+      type string;
+      description "";
+    }
+  }    
+}
+
+grouping sensor-status {
+  container status {
+
+    leaf temperature-sensor-status {
+      type sensor-status;
+      config false;
+      description
+        "The operational status of the temperature sensor.";
+    }
+
+    leaf fan-status {
+      type sensor-status;
+      config false;
+      description "alarm, normal";
+    }
+
+    leaf gps-status {
+      type sensor-status;
+      config false;
+      description "";
+    }
+
+    leaf ac-status {
+      type sensor-status;
+      config false;
+      description "";
+    }
+
+    leaf dc-status {
+      type sensor-status;
+      config false;
+      description "";
+    }
+
+    leaf pll-status {
+      type string;
+      config false;
+      description "";
+    }
+  }
+}
+
+grouping alarm-mask-group {
+  container alarm-mask {
+    config true;
+
+    leaf temperature {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf fan {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf gps {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf ac {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf dc {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf pll {
+      type boolean;
+      default false;
+      description "";
+    }
+
+    leaf mplane-connective {
+      type boolean;
+      default false;
+      description "";
+    }
+  }
+}
+
+grouping mplane-client-group {
+  container mplane-client-info {
+
+    leaf ip-rms {
+      type string;
+      config true;
+      description "";
+    }
+
+    leaf port-rms {
+      type int32;
+      config true;
+      default 6666;
+      description "";
+    }
+
+    leaf ip-rms-status {
+      type enumeration {
+        enum disconnected {
+          description "";
+        }
+        enum connected {
+          description "";
+        }
+      }
+      config true;
+      description "";
+    }
+  }
+}
+
+grouping hardware-group {
+  container hardware {
+    leaf model-name {
+      type string;
+      config false;
+      description
+        "The vendor-specific model name identifier string.";
+    }
+
+    leaf mfg-date {
+      type yang:date-and-time;
+      config false;
+      description
+        "The date of manufacturing of the managed component.Such as:
+         2021-09-01T08:30:59Z
+         2021-09-01T08:30:59+08:00
+         2021-09-01T08:30:59-08:00.";
+    }
+
+    leaf serial-num {
+      type string;
+      config true;
+      description
+        "The vendor-specific serial number string for the
+         component. The preferred value is the serial number
+         string actually printed on the component itself (if
+         present).";
+    }
+
+    leaf cpu-version {
+      type string;
+      config false;
+      description
+        "The vendor-specific version string for the CPU.
+         example:v00.01.30.";
+    }
+
+    leaf fpga-version {
+      type string;
+      config false;
+      description
+        "The vendor-specific version string for the FPGA.
+         example:v00.00.00.";
+    }
+  }
+}
+
+grouping sync-group {
+  container sync {
+    leaf gps-status {
+      type enumeration {
+          enum LOCKED {
+            description
+              "equipment is in the locked mode, as defined in ITU-T G.810";
+          }
+          enum HOLDOVER {
+            description
+              "equipment clock is in holdover mode";
+          }
+          enum FREERUN {
+            description
+              "equipment clock isn't locked to an input reference, and is not in the holdover mode";
+          }
+      }
+      config false;
+      description "unlock";
+    }
+  }
+}
+
+  // Top level container
+  container system {
+    description "System Information.";
+
+    uses system;
+    uses mplane-network-group;
+    uses mplane-client-group;
+    uses sensor-status;
+    uses alarm-mask-group;
+    uses hardware-group;
+    uses sync-group;
+    
+  }
+}

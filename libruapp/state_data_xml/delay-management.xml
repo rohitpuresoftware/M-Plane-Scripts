@@ -1,0 +1,18 @@
+<delay-management xmlns="urn:o-ran:delay:1.0">
+  <bandwidth-scs-delay-state>
+    <bandwidth>400000</bandwidth>
+    <subcarrier-spacing>120000</subcarrier-spacing>
+    <ru-delay-profile>
+      <t2a-min-up>25000</t2a-min-up>
+      <t2a-max-up>140000</t2a-max-up>
+      <t2a-min-cp-dl>50000</t2a-min-cp-dl>
+      <t2a-max-cp-dl>140000</t2a-max-cp-dl>
+      <tcp-adv-dl>25000</tcp-adv-dl>
+      <ta3-min>20000</ta3-min>
+      <ta3-max>32000</ta3-max>
+      <t2a-min-cp-ul>50000</t2a-min-cp-ul>
+      <t2a-max-cp-ul>140000</t2a-max-cp-ul>
+    </ru-delay-profile>
+  </bandwidth-scs-delay-state>
+</delay-management>
+

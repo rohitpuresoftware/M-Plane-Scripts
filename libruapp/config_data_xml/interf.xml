@@ -1,0 +1,34 @@
+<interfaces xmlns="urn:ietf:params:xml:ns:yang:ietf-interfaces" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0" nc:operation="merge">
+ 	<interface>
+		<name>ps_eth</name>
+		<type xmlns:iana-if-type="urn:ietf:params:xml:ns:yang:iana-if-type">iana-if-type:ethernetCsmacd</type>	
+		<l2-mtu xmlns="urn:o-ran:interfaces:1.0">9600</l2-mtu>
+		<vlan-tagging xmlns="urn:o-ran:interfaces:1.0">true</vlan-tagging>
+		<mac-address xmlns="urn:o-ran:interfaces:1.0">00:11:22:33:44:55</mac-address>
+	</interface>
+	<interface>
+		<name>ps_eth0_c</name>
+		<type xmlns:iana-if-type="urn:ietf:params:xml:ns:yang:iana-if-type">iana-if-type:l2vlan</type>
+		<vlan-id xmlns="urn:o-ran:interfaces:1.0">1</vlan-id>
+		<mac-address xmlns="urn:o-ran:interfaces:1.0">00:11:22:33:44:55</mac-address>
+	</interface>
+	<interface>
+		<name>ps_eth0_u</name>
+		<type xmlns:iana-if-type="urn:ietf:params:xml:ns:yang:iana-if-type">iana-if-type:l2vlan</type>
+		<vlan-id xmlns="urn:o-ran:interfaces:1.0">2</vlan-id>
+		<mac-address xmlns="urn:o-ran:interfaces:1.0">00:11:22:33:44:55</mac-address>
+	</interface>
+	<interface>
+		<name>ps_eth1_c</name>
+		<type xmlns:iana-if-type="urn:ietf:params:xml:ns:yang:iana-if-type">iana-if-type:l2vlan</type>
+		<vlan-id xmlns="urn:o-ran:interfaces:1.0">1</vlan-id>
+		<mac-address xmlns="urn:o-ran:interfaces:1.0">00:11:22:33:44:55</mac-address>
+	</interface>
+	<interface>
+		<name>ps_eth1_u</name>
+		<type xmlns:iana-if-type="urn:ietf:params:xml:ns:yang:iana-if-type">iana-if-type:l2vlan</type>
+		<vlan-id xmlns="urn:o-ran:interfaces:1.0">2</vlan-id>
+		<mac-address xmlns="urn:o-ran:interfaces:1.0">00:11:22:33:44:55</mac-address>
+	</interface>
+</interfaces>
+
