@@ -15,8 +15,9 @@
     	<low-level-tx-endpoints>
       		<name>ps_txendpoint1</name>
       		<compression>
-        		<iq-bitwidth>16</iq-bitwidth>
-        		<compression-type>STATIC</compression-type>
+        		<iq-bitwidth>12</iq-bitwidth>
+			<compression-type>STATIC</compression-type>
+			<exponent>4</exponent>
 	      	</compression>
 	      	<frame-structure>195</frame-structure>
 		<cp-length>14</cp-length>
@@ -39,8 +40,9 @@
    	<low-level-rx-endpoints>
 	      	<name>ps_rxendpoint1</name>
 	      	<compression>
-			<iq-bitwidth>16</iq-bitwidth>
-		        <compression-type>STATIC</compression-type>		         
+			<iq-bitwidth>12</iq-bitwidth>
+			<compression-type>STATIC</compression-type>
+			<exponent>4</exponent>
 		</compression>
       		<frame-structure>195</frame-structure>      	
     		<cp-type>NORMAL</cp-type>
@@ -79,8 +81,9 @@
       		<type>NR</type>
 		<gain>25</gain>	
       		<rw-duplex-scheme>TDD</rw-duplex-scheme>
-      		      		<downlink-radio-frame-offset>0</downlink-radio-frame-offset>
+      		<downlink-radio-frame-offset>0</downlink-radio-frame-offset>
 		<downlink-sfn-offset>0</downlink-sfn-offset>
+		<configurable-tdd-pattern>1</configurable-tdd-pattern>
 		<!--      		<laa-carrier-configuration>
 				<tx-antenna-ports>2</tx-antenna-ports>
 			
@@ -106,7 +109,7 @@
       
       		<downlink-radio-frame-offset>0</downlink-radio-frame-offset>
                 <downlink-sfn-offset>0</downlink-sfn-offset>
-
+		<configurable-tdd-pattern>1</configurable-tdd-pattern>
       		
 		<gain-correction>0</gain-correction>
 		<n-ta-offset>1</n-ta-offset>

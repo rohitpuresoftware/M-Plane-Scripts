@@ -190,7 +190,7 @@ echo " "
 echo "Setting up client installation..."
 cp -rf $PWD/usr/local/bin/netopeer2-cli $INSTALLER_BIN
 
-echo "Copying rpc files"
+echo "Copying rpc files in to /tmp/mplane/"
 cp -rf $PWD/mplane/example $INSTALLER_DIR/ # && rm -rf $INSTALLER_DIR/mplane/example/
 echo "Coppied"
 else

@@ -16,7 +16,7 @@
 #include "config.h"
 #endif
 
-
+#include<pthread.h>
 #include <inttypes.h>
 #include <string.h>
 #include <fcntl.h>
@@ -44,6 +44,16 @@ typedef int bool;
 #define SFTP_MAX_RW_SIZE  65536	/*261120 255KB*/
 
 #define DEBUG 1
+
+struct oran_serv {
+    sr_conn_ctx_t *sr_conn;         /**< sysrepo connection */
+    sr_session_ctx_t *sr_sess;      /**< sysrepo server session */
+    sr_subscription_ctx_t *sr_rpc_sub;  /**< sysrepo RPC subscription context */
+    sr_subscription_ctx_t *sr_data_sub; /**< sysrepo data subscription context */
+    sr_subscription_ctx_t *sr_notif_sub;    /**< sysrepo notification subscription context */
+};
+extern struct oran_serv oran_srv;
+#define SW_MGMT_PATH "/home/user/PureSoftware/MP_3.0/software_management"
 
 ///xpath defination for reading data from sysrepo 
 
@@ -214,8 +224,14 @@ extern Alarm *AlarmListTail;
 typedef enum {
     STARTED = 0,
     SUCCESS = 0,
+    COMPLETED=0,
     FAILED = -1,
-    FAILURE = -1
+    FAILURE = -1,
+    AUTHENTICATION_ERROR=1,
+    PROTOCOL_ERROR,
+    FILE_NOT_FOUND,
+    APPLICATION_ERROR,
+    TIMEOUT,
 } status_t;
 
 /**
@@ -362,6 +378,7 @@ typedef struct sw_activate_output {
  * @input & output structure for all software operations
  */
 typedef struct ru_sw_pkg_in {
+sr_session_ctx_t *session;   
     sw_pkg_opcode type;
     union {
          sw_download_input_t sw_download_in;
@@ -517,6 +534,11 @@ typedef struct ruapp_switch_out{
 /*
  * @prototype for o-ran specific apis
  */
+extern void *file_download_thread(void *);
+extern void *file_upload_thread(void *);
+
+extern void *software_download_thread(void *);
+
 extern int ps5g_mplane_change_notification(modified_data_t *in, int count);
 extern int ps5g_mplane_software_download(ru_sw_pkg_in_t *in, ru_sw_pkg_out_t **out);
 extern int ps5g_mplane_software_install(ru_sw_pkg_in_t *in, ru_sw_pkg_out_t **out);
