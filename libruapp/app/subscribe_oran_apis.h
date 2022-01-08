@@ -11,8 +11,6 @@
 
 extern void *handle ;
 
-
-
 #define ALRM_ID_SIZE 10
 #define OBJ_INST_SIZE 15
 #define TEXT_SIZE 50
@@ -276,13 +274,6 @@ deinit_o_ran_lib();
 extern int
 module_change_unsubscribe();
 
-struct oran_serv {
-    sr_conn_ctx_t *sr_conn;         /**< sysrepo connection */
-    sr_session_ctx_t *sr_sess;      /**< sysrepo server session */
-    sr_subscription_ctx_t *sr_rpc_sub;  /**< sysrepo RPC subscription context */
-    sr_subscription_ctx_t *sr_data_sub; /**< sysrepo data subscription context */
-    sr_subscription_ctx_t *sr_notif_sub;    /**< sysrepo notification subscription context */
-};
 
 typedef struct {
 char object_name[20][MAX_MOD_NAME_LEN];
@@ -300,7 +291,7 @@ SeverityLevel Severity;
 
 };
 
-extern struct oran_serv oran_srv;
+struct oran_serv oran_srv;
 
 extern struct oran_alarm oran_alarm;
 #endif

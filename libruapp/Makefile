@@ -20,6 +20,8 @@ SOURCES_LIB=$(wildcard $(SRCDIR)*.c)
 OBJECTS_LIB := $(patsubst $(SRCDIR)%,$(OBJDIR)%,$(SOURCES_LIB:.$(SRCEXT)=.$(OBJEXT)))
 SOURCES_APP=$(wildcard $(APPDIR)*.c)
 OBJECTS_APP := $(patsubst $(APPDIR)%,$(APPOBJ)%,$(SOURCES_APP:.$(SRCEXT)=.$(OBJEXT)))
+MP_LIB_DIR=/home/user/PureSoftware/MP_3.0/lib/
+
 # $@, The name of target
 # $^, The name of all depencency 
 # $<, The name of first depencency
@@ -37,17 +39,17 @@ $(BINDIR)libPS_MP.a:$(OBJECTS_APP)  $(OBJECTS_LIB)
 	ld -r $^ -o build/MP_LIB.o
 	ar rcs $@ build/MP_LIB.o
 	
-#	cp $(BINDIR)libPS_MP.so /usr/local/lib
+	cp $(BINDIR)libPS_MP.a $(MP_LIB_DIR) 
 	@echo "Done, created $@"    
 
 $(OBJDIR)%.o: $(SRCDIR)%.c
 	@echo "\nCompiling $<"
-	$(GCC) -Ilib/ -Iapp/ $(CFLAGS) $(SFLAG) -I$(INCLUDE)  $(SSH_LFLAG) $(SYSREPO_LFLAG) $(YANG_LFLAG) $<  -o $@
+	$(GCC) -Ilib/ -Iapp/ $(CFLAGS) $(SFLAG) -I$(INCLUDE)  $(SSH_LFLAG) $(SYSREPO_LFLAG) $(YANG_LFLAG) -lpthread $<  -o $@
 	@echo "Done"
 
 $(APPOBJ)%.o: $(APPDIR)%.c
 	@echo "\nCompiling $<"
-	$(GCC) -Ilib/ -Iapp/ $(CFLAGS) $(SFLAG)  -I$(INCLUDE) $(SSH_LFLAG) $(SYSREPO_LFLAG) $(YANG_LFLAG)  $< -o $@ 
+	$(GCC) -Ilib/ -Iapp/ $(CFLAGS) $(SFLAG)  -I$(INCLUDE) $(SSH_LFLAG) $(SYSREPO_LFLAG) $(YANG_LFLAG)  -lpthread $< -o $@
 	@echo "Done"
 
 $(BINDIR)libdbsubscribe.so:$(OBJECTS_APP)
@@ -56,7 +58,7 @@ $(BINDIR)libdbsubscribe.so:$(OBJECTS_APP)
 
 $(BINDIR)ruapp: $(SAMPLEDIR)main.c
 	@echo "\nCreating ruapp $^ $@"
-	$(GCC) -Ilib/ -Iapp/ $^  -Lbuild/ $(PS_MP_LFLAG) $(SSH_LFLAG) $(SYSREPO_LFLAG) $(YANG_LFLAG) $(DL_LFLAG) -o $@
+	$(GCC) -Ilib/ -Iapp/ $^  -L$(MP_LIB_DIR) $(PS_MP_LFLAG) $(SSH_LFLAG) $(SYSREPO_LFLAG) $(YANG_LFLAG) $(DL_LFLAG) -lpthread -o $@
 	@echo "Done"
 
 clean:
@@ -66,6 +68,6 @@ objclean:
 	rm -rf $(BINDIR)*.o $(APPOBJ)*.o
 
 install:
-	cp -rf $(BINDIR)ruapp /usr/local/bin
+	cp -rf $(BINDIR)ruapp /home/user/PureSoftware/MP_3.0/bin/
 #	cp -rf $(BINDIR)libdbsubscribe.so /usr/local/lib
 #	$(SYSREPO_LFLAG) $(YANG_LFLAG) $(SSH_LFLAG) $(PS_MP_LFLAG) $(DL_LFLAG) 

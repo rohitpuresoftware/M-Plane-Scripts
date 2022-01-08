@@ -1,3 +1,6 @@
 <software-download xmlns="urn:o-ran:software-management:1.0">
-    <remote-file-path>http://example.path</remote-file-path>
+        <remote-file-path>sftp://chandras@192.168.2.137:22/home/chandrs/ftp/ps5g_ru_release.zip</remote-file-path>
+        <password>
+        <password>chandras</password>
+        </password>
 </software-download>

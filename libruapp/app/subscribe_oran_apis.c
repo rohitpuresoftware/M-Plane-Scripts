@@ -1,12 +1,12 @@
 #include <dirent.h>
 #include "subscribe_oran_apis.h"
-//#ifndef ORAN_APIS
+#ifndef ORAN_APIS
 #include "oran_apis.h"
-//#endif
+#endif
+
 void *handle=0;
 
 int no_of_alarms;
-struct oran_serv oran_srv={0};
 Alarm *AlarmListHead;
 Alarm *AlarmListTail;
 	char*
@@ -109,7 +109,6 @@ int (*load_symbol(char *symbol))()
 	return symbol_p;
 }
 
-
 int
 module_change_cb(sr_session_ctx_t *session,
 		uint32_t sub_id,
@@ -130,7 +129,6 @@ module_change_cb(sr_session_ctx_t *session,
 	sr_val_t *old_value = NULL;
 	sr_val_t *new_value = NULL;
 	modified_data_t *in = NULL;
-//	int (*symbol_p)();
 
 	printf("\n\n ========== EVENT %s CHANGES: ====================================\n\n", ev_to_str(event));
 	if(SR_EV_DONE != event)
@@ -158,13 +156,8 @@ module_change_cb(sr_session_ctx_t *session,
 		val_count++;
 		capacitiy--;
 	}
-//	symbol_p = load_symbol("change_notification");
-	
-//	symbol_p=load_symbol("ps5g_mplane_change_notification");
-	
 	rc=ps5g_mplane_change_notification(in, val_count);
 
-//	rc = (*symbol_p)(in, val_count);
 
 
 
@@ -173,12 +166,12 @@ module_change_cb(sr_session_ctx_t *session,
 	else
 	{
 
-	rc= ps5g_mp_copy_config_to_startup(session,module_name);
-	
-	if(rc!=SR_ERR_OK)
-	printf("copy donfig to startup failed with Error code: %d\n",rc);
+		rc= ps5g_mp_copy_config_to_startup(session,module_name);
+
+		if(rc!=SR_ERR_OK)
+			printf("copy donfig to startup failed with Error code: %d\n",rc);
 	}
-	
+
 
 	printf("\n ========== END OF CHANGES =======================================");
 
@@ -276,7 +269,6 @@ mplane_oran_ald_communication(sr_session_ctx_t *session,
 		void *private_data)
 {
 	printf("Ald communication here\n");
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ruapp_switch_in_t in;
 	ruapp_switch_out_t *out = NULL;
@@ -285,10 +277,6 @@ mplane_oran_ald_communication(sr_session_ctx_t *session,
 	in.type = START;
 	*output_cnt = 1;
 
-	/* load the customer api and invoke with the prepared input */
-//	symbol_p = load_symbol("ps5g_mplane_start_ruapp");
-//	rc = (*symbol_p)(&in, &out);
-	
 	rc=ps5g_mplane_start_ruapp(&in, &out);
 
 	if(rc != SR_ERR_OK)
@@ -332,7 +320,6 @@ mplane_start_ruapp(sr_session_ctx_t *session,
 		size_t *output_cnt,
 		void *private_data)
 {
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ruapp_switch_in_t in;
 	ruapp_switch_out_t *out = NULL;
@@ -340,11 +327,7 @@ mplane_start_ruapp(sr_session_ctx_t *session,
 	in.type = START;
 	*output_cnt = 1;
 
-	/* load the customer api and invoke with the prepared input */
-//	symbol_p = load_symbol("ps5g_mplane_start_ruapp");
-//	rc = (*symbol_p)(&in, &out);
-	
-	rc = ps5g_mplane_start_ruapp(&in, &out);
+		rc = ps5g_mplane_start_ruapp(&in, &out);
 
 	if(rc != SR_ERR_OK)
 		goto error;
@@ -393,7 +376,6 @@ mplane_oran_software_download(sr_session_ctx_t *session,
 		void *private_data)
 {
 	int rc = SR_ERR_OK;
-//	int (*symbol_p)();
 	ru_sw_pkg_in_t in;
 	ru_sw_pkg_out_t *out = NULL;
 	wrap_sr_val_t wrap_sr_val = {0};
@@ -401,15 +383,20 @@ mplane_oran_software_download(sr_session_ctx_t *session,
 	/* Fill the input buffer */
 	in.type = SW_DOWNLOAD;
 	in.sw_download_in.remote_file_path = input->data.string_val;
+	in.session=session;
 
-	/* load the customer api and invoke with the prepared input */
-//	symbol_p = load_symbol("ps5g_mplane_software_download");
-//	rc = (*symbol_p)(&in, &out);
+	if(strstr(input[2].xpath,"password")){
+
+		if(DEBUG)	
+			printf("password %s\n",input[2].data.string_val);
+
+		in.sw_download_in.credentials.type=PASSWORD;
+		in.sw_download_in.credentials.cred_password.password._password=input[2].data.string_val;
+	}
 
 	rc=ps5g_mplane_software_download(&in, &out);
 	if(rc != SR_ERR_OK)
 	{
-//		symbol_p = NULL;
 		goto error;
 	}
 
@@ -421,12 +408,12 @@ mplane_oran_software_download(sr_session_ctx_t *session,
 			out->sw_download_out.status==STARTED ? strdup("STARTED"):strdup("FAILED"),
 			strdup("unknown"));
 
-	ADD_OUTPUT( wrap_sr_val,
-			add_str(path, "/notification-timeout"),
-			SR_INT32_T,
-			0,
-			10,
-			strdup("unknown"));
+	//	ADD_OUTPUT( wrap_sr_val,
+	//			add_str(path, "/notification-timeout"),
+	//			SR_INT32_T,
+	//			0,
+	//			10,
+	//			strdup("unknown"));
 
 	if(out->sw_download_out.status != STARTED)
 	{
@@ -463,7 +450,6 @@ mplane_oran_software_install(sr_session_ctx_t *session,
 		size_t *output_cnt,
 		void *private_data)
 {
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ru_sw_pkg_in_t in;
 	ru_sw_pkg_out_t *out = NULL;
@@ -472,10 +458,6 @@ mplane_oran_software_install(sr_session_ctx_t *session,
 	// More values can be filled and passed
 	in.type = SW_INSTALL;
 	in.sw_install_in.slot_name = input->data.string_val;
-
-//	symbol_p = load_symbol("ps5g_mplane_software_install");
-
-//	rc = (*symbol_p)(&in, &out);
 
 	rc=ps5g_mplane_software_install(&in, &out);
 
@@ -524,7 +506,6 @@ mplane_oran_software_activate(sr_session_ctx_t *session,
 		size_t *output_cnt,
 		void *private_data)
 {
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ru_sw_pkg_in_t in;
 	ru_sw_pkg_out_t *out = NULL;
@@ -532,9 +513,6 @@ mplane_oran_software_activate(sr_session_ctx_t *session,
 
 	in.type = SW_ACTIVATE;
 	in.sw_activate_in.slot_name = input->data.string_val;
-
-//	symbol_p = load_symbol("ps5g_mplane_software_activate");
-//	rc = (*symbol_p)(&in, &out);
 
 	ps5g_mplane_software_activate(&in, &out);
 	if(rc != SR_ERR_OK)
@@ -589,7 +567,6 @@ mplane_oran_file_upload(sr_session_ctx_t *session,
 		size_t *output_cnt,
 		void *private_data)
 {
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ru_file_mgmt_in_t in;
 	ru_file_mgmt_out_t *out = NULL;
@@ -611,11 +588,7 @@ mplane_oran_file_upload(sr_session_ctx_t *session,
 		in.file_upload_in.credentials.type=CERTIFICATE;
 	}
 
-//	symbol_p = load_symbol("ps5g_mplane_file_upload");
-//	rc = (*symbol_p)(&in, &out);
-	
 	rc=ps5g_mplane_file_upload(&in, &out);
-	
 	if(rc != SR_ERR_OK)
 		goto error;
 
@@ -662,7 +635,6 @@ mplane_oran_retrieve_file_list(sr_session_ctx_t *session,
 		void *private_data)
 {
 	int file_i = 0;
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ru_file_mgmt_in_t in;
 	ru_file_mgmt_out_t *out = NULL;
@@ -671,10 +643,6 @@ mplane_oran_retrieve_file_list(sr_session_ctx_t *session,
 	in.type = FILE_LIST;
 	in.file_retrieve_in.logical_path = input[0].data.string_val;
 	in.file_retrieve_in.file_name_filter = input[1].data.string_val;
-
-//	symbol_p = load_symbol("ps5g_mplane_retrieve_file_list");
-
-//	rc = (*symbol_p)(&in, &out);
 
 	rc=ps5g_mplane_retrieve_file_list(&in, &out);
 	if(rc != SR_ERR_OK)
@@ -737,7 +705,6 @@ mplane_oran_file_download(sr_session_ctx_t *session,
 		size_t *output_cnt,
 		void *private_data)
 {
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ru_file_mgmt_in_t in;
 	ru_file_mgmt_out_t *out = NULL;
@@ -757,10 +724,8 @@ mplane_oran_file_download(sr_session_ctx_t *session,
 	else if(strstr(input[3].xpath,"certificate")){
 		in.file_upload_in.credentials.type=CERTIFICATE;
 	}
-//	symbol_p = load_symbol("ps5g_mplane_file_download");
-//	rc = (*symbol_p)(&in, &out);
 
-rc=ps5g_mplane_file_download(&in, &out);
+	rc=ps5g_mplane_file_download(&in, &out);
 
 	if(rc != SR_ERR_OK)
 		goto error;
@@ -810,18 +775,13 @@ mplane_oran_trace_start(sr_session_ctx_t *session,
 {
 	printf("mplane_oran_trace_start rpc call \n");
 
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ru_trace_out_t *out;	
 	ru_trace_switch_in_t in;	
 
 	wrap_sr_val_t wrap_sr_val = {0};
 	in.type = START;
-
 	in.session=session;
-
-//	symbol_p = load_symbol("ps5g_mp_trace_start");	
-//	rc = (*symbol_p)(&in, &out);        	
 
 	rc=ps5g_mp_trace_start(&in, &out);
 
@@ -875,7 +835,6 @@ int mplane_oran_trace_stop(sr_session_ctx_t *session,
 
 	printf("mplane_oran_trace_stop rpc call \n");
 
-//	int (*symbol_p)();
 	int rc = SR_ERR_OK;
 	ru_trace_out_t *out;	
 	ru_trace_switch_in_t in;	
@@ -885,9 +844,6 @@ int mplane_oran_trace_stop(sr_session_ctx_t *session,
 
 	in.session=session;
 
-//	symbol_p = load_symbol("ps5g_mp_trace_stop");	
-//	rc = (*symbol_p)(&in, &out);        	
-	
 	rc=ps5g_mp_trace_stop(&in, &out);
 
 	*output_cnt = 1;
@@ -1218,6 +1174,39 @@ cleanup:
 	return rc;
 }
 
+int start_file_download_thread()
+{
+	printf("file_download_thread started\n");
+	pthread_t file_d_thread;
+	int rc=pthread_create(&file_d_thread,NULL,file_download_thread,NULL);
+	if(rc!=SR_ERR_OK)
+		goto error;
+error:
+	return rc;
+}
+
+int start_file_upload_thread()
+{
+	printf("file_upload_thread started\n");
+	pthread_t file_ul_thread;
+	int rc=pthread_create(&file_ul_thread,NULL,file_upload_thread,NULL);
+	if(rc!=SR_ERR_OK)
+		goto error;
+error:
+	return rc;
+
+}
+int start_software_download_thread()
+{
+	printf("software download thread started\n");
+	pthread_t sw_dl_thread;
+	int rc=pthread_create(&sw_dl_thread,NULL,software_download_thread,NULL);
+	if(rc!=SR_ERR_OK)
+		goto error;
+error:
+	return rc;		
+}
+
 int o_ran_lib_init()
 {
 	int rc = SR_ERR_OK;
@@ -1292,29 +1281,29 @@ dp_get_items_cb(sr_session_ctx_t *session, uint32_t sub_id, const char *module_n
 	//	printf("***************before*********\n");
 		sprintf(path,"/o-ran-fm:active-alarm-list/active-alarms[%d]/fault-id",i);
 		lyd_new_path(*parent, sr_get_context(sr_session_get_connection(session)),path,(alarm_tmp->fault_id), 0, NULL);
-		
+
 		sprintf(path,"/o-ran-fm:active-alarm-list/active-alarms[%d]/fault-source",i);
-        	lyd_new_path(*parent, NULL, path, alarm_tmp->fault_source, 0, NULL);
-		
+	lyd_new_path(*parent, NULL, path, alarm_tmp->fault_source, 0, NULL);
+
 		sprintf(path,"/o-ran-fm:active-alarm-list/active-alarms[%d]/fault-severity",i);
-        	lyd_new_path(*parent, NULL, path, alarm_tmp->fault_severity, 0, NULL);
-        	
+		lyd_new_path(*parent, NULL, path, alarm_tmp->fault_severity, 0, NULL);
+
 		sprintf(path,"/o-ran-fm:active-alarm-list/active-alarms[%d]/is-cleared",i);
 		lyd_new_path(*parent, NULL, path, alarm_tmp->is_cleared, 0, NULL);
-        	
+
 		sprintf(path,"/o-ran-fm:active-alarm-list/active-alarms[%d]/affected-objects/name",i);
 		lyd_new_path(*parent, NULL, path, alarm_tmp->name, 0, NULL);
-        	
+
 		sprintf(path,"/o-ran-fm:active-alarm-list/active-alarms[%d]/fault-text",i);
-                lyd_new_path(*parent, NULL, path, alarm_tmp->fault_text, 0, NULL);
-		
+		lyd_new_path(*parent, NULL, path, alarm_tmp->fault_text, 0, NULL);
+
 		sprintf(path,"/o-ran-fm:active-alarm-list/active-alarms[%d]/event-time",i);
 		lyd_new_path(*parent, NULL, path, alarm_tmp->event_time, 0, NULL);
 		i++;
 		alarm_tmp = alarm_tmp->next;
 	}
 
-    return SR_ERR_OK;
+	return SR_ERR_OK;
 }
 
 
@@ -1357,17 +1346,29 @@ o_ran_lib_sub()
 
 
 	/*******for trace start/stop********/	
-	MemForTrace=mmap(NULL,1,PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0);\
-
-		    sprintf( MemForTrace,"%d",STOP);
 
 	/* subscribe for providing the operational data */
 
-  int  rc = sr_oper_get_items_subscribe(oran_srv.sr_sess,"o-ran-fm","/o-ran-fm:active-alarm-list/*" , dp_get_items_cb, NULL, 0, &oran_srv.sr_rpc_sub);
-    if (rc != SR_ERR_OK) {
-       printf("alarm data subscription error\n");
-    }
-	
+	int  rc = sr_oper_get_items_subscribe(oran_srv.sr_sess,"o-ran-fm","/o-ran-fm:active-alarm-list/*" , dp_get_items_cb, NULL, 0, &oran_srv.sr_rpc_sub);
+	if (rc != SR_ERR_OK) {
+		printf("alarm data subscription error\n");
+	}
+
+	rc=start_file_download_thread();
+	if(rc != SR_ERR_OK)
+	{
+		printf("file_download_thread_fail\n");
+	}
+	rc=start_file_upload_thread();
+	if(rc != SR_ERR_OK)
+	{
+		printf("file_upload_thread_fail\n");
+	}
+	rc=start_software_download_thread();
+	if(rc != SR_ERR_OK)
+	{
+		printf("software_download_thread_fail\n");
+	}
 	return 0;
 }
 
@@ -1385,11 +1386,6 @@ int o_ran_lib_deinit()
 o_ran_lib_init_ctx()
 {
 	int rc = SR_ERR_OK;
-//	handle = dlopen ("libPS_MP.so", RTLD_LAZY);
-//	if (!handle) {
-//		fprintf (stderr, "%s\n", dlerror());
-//		exit(1);
-//	}
 	dlerror();    /* Clear any existing error */
 	rc = o_ran_lib_init();
 	rc = o_ran_lib_sub();
@@ -1400,6 +1396,5 @@ o_ran_lib_init_ctx()
 o_ran_lib_deinit_ctx()
 {
 	o_ran_lib_deinit();
-//	dlclose(handle);
 	return 0;
 }

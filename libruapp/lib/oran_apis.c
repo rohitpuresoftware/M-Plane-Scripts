@@ -6,6 +6,48 @@
 /**
  * @This is a temp function, just to validate values
  */
+
+/*
+variables for file uplaod operation
+
+*/
+char file_ul_remote_path[MAX_PATH_LEN];
+char file_ul_remote_path_cp[MAX_PATH_LEN]={0};
+char file_ul_error[MAX_PATH_LEN]={0};
+char *file_ul_remote_path_substring[5];
+char *file_ul_local_path={NULL};
+ssh_session file_ul_session;
+const char *file_ul_path="/o-ran-file-management:file-upload-notification";
+const char *file_ul_node_path[]={"local-logical-file-path","remote-file-path","status","reject-reason"};
+char *file_ul_password={NULL};	
+
+/*
+variables for file download operation
+*/
+
+ssh_session file_dwn_session;
+char *file_dwn_remote_path_substr[5]={NULL};
+char file_dwn_error[MAX_PATH_LEN]={0};
+char *file_dwn_password={NULL};
+char *file_dwn_local_path={NULL};
+char file_dwn_remote_path[MAX_PATH_LEN]={0};
+char temp[MAX_PATH_LEN]={0};
+const char *f_dwn_path="/o-ran-file-management:file-download-event";
+int file_download_flag=0;
+
+int file_upload_flag=0;
+/*
+   variables for software-downalod */
+
+char sw_dl_error[MAX_PATH_LEN]={0};
+ssh_session sw_dl_session;
+const char *sw_dl_path="/o-ran-software-management:download-event";
+const char *sw_dl_node_path[]={"file-name","status","error-message"};
+char *sw_dl_remote_path_substring[5]={NULL};
+char *sw_dl_password=NULL;
+char sw_dl_remote_path[MAX_PATH_LEN]={0};
+int software_dl_flag=0;
+
 	void
 print_val(const notification_val_t *value)
 {
@@ -135,37 +177,120 @@ ps5g_mplane_change_notification(modified_data_t *in, int count)
 	return 0;
 }
 
-	int
+ 
+void *software_download_thread(void *arg)
+{
+	int rc=0;
+	while(1)
+	{
+		if(software_dl_flag)
+		{
+			sw_dl_session=ps5g_mp_connect_ssh(sw_dl_remote_path_substring[1],NULL,0,sw_dl_password,&sw_dl_error[0]);	
+			if(sw_dl_session==NULL){
+			
+				const char *node_val[]={sw_dl_remote_path,"AUTHENTICATION_ERROR",sw_dl_error};
+				ps5g_mplane_send_notification(oran_srv.sr_sess,sw_dl_path,sw_dl_node_path,node_val,3);
+			}
+			else{
+			
+			rc=ps5g_mp_download_from_remote(sw_dl_session,SW_MGMT_PATH,sw_dl_remote_path,&sw_dl_error[0]);
+			if(rc!=1){
+				const char *node_val[]={strrchr(sw_dl_remote_path,'/')+1,"COMPLETED"};
+
+				ps5g_mplane_send_notification(oran_srv.sr_sess,sw_dl_path,sw_dl_node_path,node_val,2);
+			}
+			else{
+				const char *node_val[]={sw_dl_remote_path,"FILE_NOT_FOUND",sw_dl_error};
+
+				ps5g_mplane_send_notification(oran_srv.sr_sess,sw_dl_path,sw_dl_node_path,node_val,4);
+			}
+			 }
+			ssh_disconnect(sw_dl_session);
+			ssh_free(sw_dl_session);
+			free(sw_dl_remote_path_substring[1]);
+			free(sw_dl_password);
+			software_dl_flag=0;
+		}
+		else{
+			usleep(1000);
+		}
+	}
+}
+
+int
 ps5g_mplane_software_download(ru_sw_pkg_in_t *in,
 		ru_sw_pkg_out_t **out)
 {
 	int rc = 0;
 	ru_sw_pkg_out_t *output = NULL;
 
-	printf("Command Type: %d\n", in->type);
-	printf("URI: %s\n", in->sw_download_in.remote_file_path);
+	printf("URI:%s\n", in->sw_download_in.remote_file_path);
 
-	printf("Filling output content will be be sent back to NMS\n");
+	//	printf("password :%s\n",in->sw_download_in.credentials.cred_password.password._password);
+	//	printf("Filling output content will be sent back to NMS\n");
+
+
+	char temp[MAX_PATH_LEN]={0};
+	sprintf(temp,"%s",strrchr(in->sw_download_in.remote_file_path,':')+1);
+
+	//	printf("port %s path %s\n", temp,strchr(temp,'/'));
+
+	sprintf(sw_dl_remote_path,"%s",strchr(temp,'/'));
+
+	const char s[3] = ":/";
+	int i=0; 
+
+	//	strcpy(temp,in->sw_download_in.remote_file_path);
+
+	sw_dl_remote_path_substring[i++]=strtok(in->sw_download_in.remote_file_path,s);
+
+	//to extract user name sw_dl_remote_path_substring[1]
+	while( sw_dl_remote_path_substring[i-1] != NULL ) {
+		//	  printf( " %s\n", sw_dl_remote_path_substring[i-1] );
+
+		sw_dl_remote_path_substring[i++] = strtok(NULL, s);
+		if(i>1)
+			break;
+	}
+
+	sw_dl_session=ps5g_mp_connect_ssh(sw_dl_remote_path_substring[1],NULL,0,in->sw_download_in.credentials.cred_password.password._password,&sw_dl_error[0]);	
+	
 
 	output = malloc(sizeof(ru_sw_pkg_out_t));
 	output->type = in->type;
 
+	if(sw_dl_session==NULL){
+		output->sw_download_out.status = FAILURE;
+		output->sw_download_out. error_message= strdup(sw_dl_error);
+		goto end;
+	}
+
+	rc=ps5g_mp_download_accept(sw_dl_session,SW_MGMT_PATH,sw_dl_remote_path,&sw_dl_error[0]); 
 	/* assume start process failed */
-	rc = -1;
-	if(rc == -1)
-	{
+	if(rc == 1){
 		output->sw_download_out.status = FAILED;
-		output->sw_download_out.error_message = strdup("Failed to start software download");
+		//	output->sw_download_out.error_message = strdup("Failed to start software download");
+		output->sw_download_out.error_message = strdup(sw_dl_error);
+		goto end;	
 	}
-	else
-	{
+	else{
 		output->sw_download_out.status = STARTED;
-	}
+		sw_dl_remote_path_substring[1]=strdup(sw_dl_remote_path_substring[1]);
+		sw_dl_password=strdup(in->sw_download_in.credentials.cred_password.password._password);	
+		software_dl_flag=1;
+#if 1
+
+		}
+#endif
+	
+	ssh_disconnect(sw_dl_session);
+	ssh_free(sw_dl_session);
+end:
 	*out = output;
 	return 0;
 }
 
-	int
+int
 ps5g_mplane_software_install(ru_sw_pkg_in_t *in,
 		ru_sw_pkg_out_t **out)
 {
@@ -192,7 +317,7 @@ ps5g_mplane_software_install(ru_sw_pkg_in_t *in,
 	return 0;
 }
 
-	int
+int
 ps5g_mplane_software_activate(ru_sw_pkg_in_t *in,
 		ru_sw_pkg_out_t **out)
 {
@@ -219,54 +344,103 @@ ps5g_mplane_software_activate(ru_sw_pkg_in_t *in,
 	return 0;
 }
 
+
+void *file_upload_thread(void *arg)
+{
+	while(1)
+	{
+		if(file_upload_flag)
+		{
+			int rc=SUCCESS;
+
+			file_ul_session=ps5g_mp_connect_ssh(file_ul_remote_path_substring[1],NULL,0,file_ul_password,&file_ul_error[0]);	
+
+			if(file_ul_session==NULL){
+
+				const char *node_val[]={file_ul_local_path,file_ul_remote_path,"FAILURE",file_ul_error};
+				ps5g_mplane_send_notification(oran_srv.sr_sess ,file_ul_path,file_ul_node_path,node_val,4);
+			}
+			else
+			{			
+
+				rc=ps5g_mp_upload_to_remote(file_ul_session,file_ul_local_path,file_ul_remote_path,file_ul_error);
+
+				if(rc!=1)
+				{
+					const char *node_val[]={file_ul_local_path,file_ul_remote_path_cp,"SUCCESS"};
+					ps5g_mplane_send_notification(oran_srv.sr_sess,file_ul_path,file_ul_node_path,node_val,3);
+
+				}	
+				else
+				{
+					const char *node_val[]={file_ul_local_path,file_ul_remote_path,"FAILURE",file_ul_error};
+					ps5g_mplane_send_notification(oran_srv.sr_sess ,file_ul_path,file_ul_node_path,node_val,4);
+
+				}			
+
+				ssh_disconnect(file_ul_session);
+				ssh_free(file_ul_session);
+			}	
+			free(file_ul_password);
+			free(file_ul_local_path);
+			free(file_ul_remote_path_substring[1]);
+			printf("File upload is done\n");
+			file_upload_flag=0;
+		}	
+		else
+			usleep(1000);
+	}
+
+
+}
 	int
 ps5g_mplane_file_upload(ru_file_mgmt_in_t *in,
 		ru_file_mgmt_out_t **out)
 {
 	int rc = SUCCESS;
 	ru_file_mgmt_out_t *output;
-	ssh_session session;
 
 	printf("Local PATH: %s\n", in->file_upload_in.path.local_logical_file_path);
 	printf("Remote PATH: %s\n", in->file_upload_in.path.remote_file_path);
-	//	printf("password :%s\n",in->file_upload_in.credentials.cred_password.password._password);
-	//	char *temp=strrchr(in->file_upload_in.path.remote_file_path,':')+1;
-	//	printf("port %s path %s\n", temp,strchr(temp,'/'));
+	file_ul_password=strdup(in->file_upload_in.credentials.cred_password.password._password);
+	file_ul_local_path=strdup(in->file_upload_in.path.local_logical_file_path);
+	printf("password :%s\n",in->file_upload_in.credentials.cred_password.password._password);
 
-	char *token[5];
+	//	char *file_ul_remote_path_cp=strrchr(in->file_upload_in.path.remote_file_path,':')+1;
+	//	printf("port %s path %s\n", file_ul_remote_path_cp,strchr(file_ul_remote_path_cp,'/'));
+
 	const char s[] = ":/";
 	int i=0; 
-	char temp[MAX_PATH_LEN]={0};
-	strcpy(temp,in->file_upload_in.path.remote_file_path);
+	strcpy(file_ul_remote_path_cp,in->file_upload_in.path.remote_file_path);
 
-	token[i++]=strtok(in->file_upload_in.path.remote_file_path,s);
+	file_ul_remote_path_substring[i++]=strtok(in->file_upload_in.path.remote_file_path,s);
 
 
-	while( token[i-1] != NULL ) {
-		//  printf( " %s\n", token[i-1] );
+	while( file_ul_remote_path_substring[i-1] != NULL ) {
+		//		 printf( "-- %s\n", file_ul_remote_path_substring[i-1] );
 
-		token[i++] = strtok(NULL, s);
+		file_ul_remote_path_substring[i++] = strtok(NULL, s);
 	}
 
-	char remote_path[MAX_PATH_LEN];
-	char error[MAX_PATH_LEN]={0};
+	file_ul_remote_path_substring[1]=strdup(file_ul_remote_path_substring[1]);
 
-	sprintf(remote_path,"%s%s",token[3],strrchr(in->file_upload_in.path.local_logical_file_path,'/'));
 
-	//printf("remote_path %s \n",remote_path);
+	sprintf(file_ul_remote_path,"%s%s",file_ul_remote_path_substring[3],strrchr(in->file_upload_in.path.local_logical_file_path,'/'));
 
-	session=ps5g_mp_connect_ssh(token[1],NULL,0,in->file_upload_in.credentials.cred_password.password._password,&error[0]);	
+	printf("remote_path %s\n",file_ul_remote_path);
+
+	file_ul_session=ps5g_mp_connect_ssh(file_ul_remote_path_substring[1],NULL,0,in->file_upload_in.credentials.cred_password.password._password,&file_ul_error[0]);	
 
 	output = malloc(sizeof(ru_file_mgmt_out_t));
 	output->type = in->type;
 
-	if(session==NULL){
-		output->file_upload_out.reject_reason = strdup(error);
+	if(file_ul_session==NULL){
+		output->file_upload_out.reject_reason = strdup(file_ul_error);
 
 		output->file_upload_out.status = FAILURE;
 		goto end;	
 	}	
-	rc=ps5g_mp_file_upload_accept(session,in->file_upload_in.path.local_logical_file_path,remote_path,&error[0]);
+	rc=ps5g_mp_file_upload_accept(file_ul_session,in->file_upload_in.path.local_logical_file_path,file_ul_remote_path,&file_ul_error[0]);
 
 
 	/* assume start process failed */
@@ -274,59 +448,21 @@ ps5g_mplane_file_upload(ru_file_mgmt_in_t *in,
 	{
 
 		output->file_upload_out.status = FAILURE;
-		output->file_upload_out.reject_reason = strdup(error);
+		output->file_upload_out.reject_reason = strdup(file_ul_error);
 		goto end;
 	}
 	else
 	{
 		output->file_upload_out.status = SUCCESS;
-		pid_t pid=fork();
-		if(pid==0)
-		{
-
-			session=ps5g_mp_connect_ssh(token[1],NULL,0,in->file_upload_in.credentials.cred_password.password._password,&error[0]);	
-
-			if(session==NULL){
-
-				output->file_upload_out.status = FAILURE;
-				sprintf(output->file_upload_out.reject_reason,"%s",ssh_get_error(session));
-				goto end;
-			}	
-			rc=ps5g_mp_upload_to_remote(session,in->file_upload_in.path.local_logical_file_path,remote_path,error);
-
-
-			const char *path="/o-ran-file-management:file-upload-notification";
-			const char *node_path[]={"local-logical-file-path","remote-file-path","status","reject-reason"};
-
-			if(rc!=1)
-			{
-				const char *node_val[]={in->file_upload_in.path.local_logical_file_path,temp,"SUCCESS"};
-				ps5g_mplane_send_notification(in->session,path,node_path,node_val,3);
-
-			}	
-			else
-			{
-				const char *node_val[]={in->file_upload_in.path.local_logical_file_path,in->file_upload_in.path.remote_file_path,"FAILURE",error};
-
-				ps5g_mplane_send_notification(in->session,path,node_path,node_val,4);
-
-			}			
-
-			ssh_disconnect(session);
-			ssh_free(session);
-			exit(0);
-
-		}
-
+		file_upload_flag=1;
 	}
-	ssh_disconnect(session);
-	ssh_free(session);
+	ssh_disconnect(file_ul_session);
+	ssh_free(file_ul_session);
 end:
-
-
 	*out = output;
 	return 0;
 }
+
 void remove_star(char *str)
 {
 	int len = strlen(str),i=0,j=0;
@@ -420,119 +556,124 @@ ps5g_mplane_retrieve_file_list(ru_file_mgmt_in_t *in,
 	return 0;
 }
 
+void* file_download_thread(void *arg)
+{
+	while(1)
+	{
+		//				printf("file_download_flag %d\n",file_download_flag);
+		if(file_download_flag)
+		{
+
+			//	printf("password :%s %d** %s %s\n",password,__LINE__,file_dwn_remote_path,temp);
+			int rc = SUCCESS;
+
+			file_dwn_session=ps5g_mp_connect_ssh(file_dwn_remote_path_substr[1],NULL,0,file_dwn_password,&file_dwn_error[0]);
+
+			if(file_dwn_session==NULL){
+
+				sprintf(file_dwn_error,"%s",ssh_get_error(file_dwn_session));
+				const char *node_val[]={temp,"FAILURE",file_dwn_error};
+				ps5g_mplane_send_notification(oran_srv.sr_sess,f_dwn_path,file_ul_node_path,node_val,4);
+			}
+
+			rc=ps5g_mp_download_from_remote(file_dwn_session,file_dwn_local_path,file_dwn_remote_path,&file_dwn_error[0]);
+			if(rc!=1)	 
+			{
+
+				const char *node_val[]={file_dwn_local_path,temp,"SUCCESS"};
+
+				ps5g_mplane_send_notification(oran_srv.sr_sess,f_dwn_path,file_ul_node_path,node_val,3);
+			}
+			else
+			{
+				const char *node_val[]={file_dwn_local_path,temp,"FAILURE",file_dwn_error};
+
+				ps5g_mplane_send_notification(oran_srv.sr_sess,f_dwn_path,file_ul_node_path,node_val,9);
+
+			}
+			ssh_disconnect(file_dwn_session);
+			ssh_free(file_dwn_session);
+			free(file_dwn_password);
+			free(file_dwn_local_path);
+			file_download_flag=0;
+			printf("file-downlaod completed\n");
+		}
+		else
+			usleep(1000);
+	}
+	return 0;
+}
+
+
 	int
 ps5g_mplane_file_download(ru_file_mgmt_in_t *in,
 		ru_file_mgmt_out_t **out)
 {
 	int rc = SUCCESS;
 	ru_file_mgmt_out_t *output;
-	ssh_session session;
 	printf("file-download rpc hit\n");
-	printf("Local PATH: %s\n", in->file_download_in.path.local_logical_file_path);
+	printf("Local PATH: %s/\n", in->file_download_in.path.local_logical_file_path);
 	printf("Remote PATH: %s\n", in->file_download_in.path.remote_file_path);
+	file_dwn_password=strdup(in->file_download_in.credentials.cred_password.password._password);
+	file_dwn_local_path=strdup(in->file_download_in.path.local_logical_file_path);
 
-	//printf("password :%s\n",in->file_upload_in.credentials.cred_password.password._password);
+	printf("password :%s\n",in->file_download_in.credentials.cred_password.password._password);
 
-	char remote_path[MAX_PATH_LEN]={0};
 
-	char temp[MAX_PATH_LEN]={0};
 	sprintf(temp,"%s",strrchr(in->file_download_in.path.remote_file_path,':')+1);
 
-	//	printf("port %s path %s\n", temp,strchr(temp,'/'));
+	sprintf(file_dwn_remote_path,"%s",strchr(temp,'/'));
 
-	sprintf(remote_path,"%s",strchr(temp,'/'));
+	//	printf("file_dwn_remote_path %s %d\n",file_dwn_remote_path,__LINE__);
 
-	//	printf("remote_path %s %d\n",remote_path,__LINE__);
-
-	char *token[5]={NULL};
 	const char s[3] = ":/";
 	int i=0; 
-	char error[MAX_PATH_LEN]={0};
 
 	strcpy(temp,in->file_download_in.path.remote_file_path);
 
-	token[i++]=strtok(in->file_download_in.path.remote_file_path,s);
-	while( token[i-1] != NULL ) {
-		//	  printf( " %s\n", token[i-1] );
+	file_dwn_remote_path_substr[i++]=strtok(in->file_download_in.path.remote_file_path,s);
 
-		token[i++] = strtok(NULL, s);
+	while( file_dwn_remote_path_substr[i-1] != NULL ) {
+		//	  printf( " %s\n", file_dwn_remote_path_substr[i-1] );
+
+		file_dwn_remote_path_substr[i++] = strtok(NULL, s);
 		if(i>1)
 			break;
 	}
 
-	session=ps5g_mp_connect_ssh(token[1],NULL,0,in->file_download_in.credentials.cred_password.password._password,&error[0]);	
+	file_dwn_remote_path_substr[1]=strdup(file_dwn_remote_path_substr[1]);
+	file_dwn_session=ps5g_mp_connect_ssh(file_dwn_remote_path_substr[1],NULL,0,in->file_download_in.credentials.cred_password.password._password,&file_dwn_error[0]);	
 
 	output = malloc(sizeof(ru_file_mgmt_out_t));
 	output->type = in->type;
 
-	if(session==NULL){
+	if(file_dwn_session==NULL){
 		output->file_download_out.status = FAILURE;
-		output->file_download_out.reject_reason = strdup(error);
+		output->file_download_out.reject_reason = strdup(file_dwn_error);
 		goto end;
 	}
 
-	rc=ps5g_mp_download_accept(session,in->file_download_in.path.local_logical_file_path,remote_path,&error[0]); 
+	rc=ps5g_mp_download_accept(file_dwn_session,in->file_download_in.path.local_logical_file_path,file_dwn_remote_path,&file_dwn_error[0]); 
 
 	/* assume start process failed */
 	//	rc = -1;
 	if(rc == 1)
 	{
 		output->file_download_out.status = FAILURE;
-		output->file_download_out.reject_reason = strdup(error);
+		output->file_download_out.reject_reason = strdup(file_dwn_error);
 		goto end;
 	}
 	else
 	{
 		output->file_download_out.status = SUCCESS;
-		pid_t pid=fork();
 
-		if(pid==0)
-		{
-			char error[MAX_PATH_LEN]={0};
-
-
-			session=ps5g_mp_connect_ssh(token[1],NULL,0,in->file_download_in.credentials.cred_password.password._password,&error[0]);	
-
-			output = malloc(sizeof(ru_file_mgmt_out_t));
-			output->type = in->type;
-
-			if(session==NULL){
-				output->file_download_out.status = FAILURE;			
-				sprintf(output->file_download_out.reject_reason,"%s",ssh_get_error(session));
-				goto end;
-			}
-			rc=ps5g_mp_download_from_remote(session,in->file_download_in.path.local_logical_file_path,remote_path,&error[0]);
-			const char *path="/o-ran-file-management:file-download-event";
-			const char *node_path[]={"local-logical-file-path","remote-file-path","status","reject-reason"};
-
-			if(rc!=1)	 
-			{
-				const char *node_val[]={in->file_download_in.path.local_logical_file_path,
-					temp,"SUCCESS"};
-
-				ps5g_mplane_send_notification(in->session,path,node_path,node_val,3);
-
-			}
-			else
-			{
-
-				const char *node_val[]={in->file_download_in.path.local_logical_file_path,
-					temp,"FAILURE",error};
-
-				ps5g_mplane_send_notification(in->session,path,node_path,node_val,4);
-
-			}
-			ssh_disconnect(session);
-			ssh_free(session);
-			exit(0);
-		}
+		file_download_flag=1;
 	}
-	ssh_disconnect(session);
-	ssh_free(session);
+
+	ssh_disconnect(file_dwn_session);
+	ssh_free(file_dwn_session);
 end:
 	*out = output;
-
-	//	puts("before end");
 	return 0;
 }
 
@@ -600,10 +741,10 @@ ps5g_mp_trace_start(ru_trace_switch_in_t *in,
 
 
 	output=malloc(sizeof(ru_trace_switch_in_t));
-//	printf("Command Type: %d\n", in->type);
+	//	printf("Command Type: %d\n", in->type);
 
 #if 1
-//	if(atoi(MemForTrace)==START)	/*check whether trace running or nor**/
+	//	if(atoi(MemForTrace)==START)	/*check whether trace running or nor**/
 	if(trace_start==1)
 	{		
 		output->status=FAILURE;
@@ -673,13 +814,13 @@ ps5g_mp_trace_stop(ru_trace_switch_in_t *in,
 		ru_trace_out_t **out)
 {
 	ru_trace_out_t *output = NULL;
-//	int stop=STOP;
-//	stop=atoi(MemForTrace);	
+	//	int stop=STOP;
+	//	stop=atoi(MemForTrace);	
 	output=malloc(sizeof(ru_trace_switch_in_t));
-	
-	
 
-//	printf("in ps5g_mp_trace_stop \n");
+
+
+	//	printf("in ps5g_mp_trace_stop \n");
 	if(trace_start==0){
 
 		output->status=FAILURE;
@@ -689,7 +830,7 @@ ps5g_mp_trace_stop(ru_trace_switch_in_t *in,
 	}
 
 	else{
-//		sprintf(MemForTrace,"%d",STOP);		
+		//		sprintf(MemForTrace,"%d",STOP);		
 		output->status=SUCCESS;
 		trace_start=0;
 		printf("Trace stopped \n");
@@ -833,14 +974,14 @@ cleanup:
 	int 
 ps5g_mplane_send_notification(sr_session_ctx_t *session,const char *path,const char *node_path[],const char* node_val[],int cnt)
 {
-
 	int rc = SR_ERR_OK,loop_cnt=0;
 	struct lyd_node *notif = NULL;
 	const struct ly_ctx *ctx;	
-	ctx = sr_get_context(sr_session_get_connection(session));	
+	ctx = sr_get_context(sr_session_get_connection(session));
+
 	rc= lyd_new_path(NULL, ctx, path, NULL, 0, &notif);
 	if (rc!=SR_ERR_OK) {
-		printf("Creating notification \"%s\" failed %d \n", path,rc);
+		printf("Creating notification \"%s\" failed with return value %d \n", path,rc);
 		goto cleanup;
 	}
 
@@ -873,35 +1014,35 @@ ps5g_mplane_raise_alarm(sr_session_ctx_t *session,char *node_val[7])
 	printf("In raise_alarm\n");
 	int rc =0 ;
 
-		Alarm* chk =AlarmListHead;
+	Alarm* chk =AlarmListHead;
 
-		while(chk!=NULL){
-			/* to eliminate new alarm with severity "WARNING"  chapter 8 , 2nd para 1st line */
-			if(strcmp(node_val[2],"WARNING")==0||(((strcmp(chk->fault_id,node_val[0])==0) && 
-			(strcmp(chk->fault_source,node_val[1])==0) && (strcmp(chk->fault_severity,node_val[2])==0)))){
-				return 0;
-			}
-			/*to to detect duplicate alarm*/
-			else if((strcmp(chk->fault_id,node_val[0])==0) && (strcmp(chk->fault_source,node_val[1])==0) && 
+	while(chk!=NULL){
+		/* to eliminate new alarm with severity "WARNING"  chapter 8 , 2nd para 1st line */
+		if(strcmp(node_val[2],"WARNING")==0||(((strcmp(chk->fault_id,node_val[0])==0) && 
+						(strcmp(chk->fault_source,node_val[1])==0) && (strcmp(chk->fault_severity,node_val[2])==0)))){
+			return 0;
+		}
+		/*to to detect duplicate alarm*/
+		else if((strcmp(chk->fault_id,node_val[0])==0) && (strcmp(chk->fault_source,node_val[1])==0) && 
 				(strcmp(chk->name,node_val[2])==0) && (strcmp(chk->fault_severity,node_val[3])==0) && 
 				(strcmp(chk->is_cleared,node_val[4])==0) && (strcmp(chk->fault_text,node_val[6])==0)){
 
-				printf("duplicate alarm \n");
-				return 0;	
-			}			
-			/*to detect change inseverity 8.3 */
-			else if((strcmp(chk->fault_id,node_val[0])==0) && (strcmp(chk->fault_source,node_val[1])==0) &&
-				 (strcmp(chk->fault_severity,node_val[2])!=0) && (strcmp(chk->is_cleared,"true")!=0)){
-				
-				chk->is_cleared = strdup("true");
-			}
-//			else if((strcmp(chk->fault_id,node_val[0])==0) && (strcmp(chk->fault_source,node_val[1])==0) && 
-//				(strcmp(chk->fault_severity,node_val[2])!=0) && (strcmp(chk->is_cleared,"true")==0)){
-//
-//				chk->is_cleared = strdup("false");
-//			}
-			chk = chk->next;
+			printf("duplicate alarm \n");
+			return 0;	
+		}			
+		/*to detect change inseverity 8.3 */
+		else if((strcmp(chk->fault_id,node_val[0])==0) && (strcmp(chk->fault_source,node_val[1])==0) &&
+				(strcmp(chk->fault_severity,node_val[2])!=0) && (strcmp(chk->is_cleared,"true")!=0)){
+
+			chk->is_cleared = strdup("true");
 		}
+		//			else if((strcmp(chk->fault_id,node_val[0])==0) && (strcmp(chk->fault_source,node_val[1])==0) && 
+		//				(strcmp(chk->fault_severity,node_val[2])!=0) && (strcmp(chk->is_cleared,"true")==0)){
+		//
+		//				chk->is_cleared = strdup("false");
+		//			}
+		chk = chk->next;
+	}
 	Alarm* NewAlarm = (struct alarm*)malloc(sizeof(struct alarm)) ;
 
 	NewAlarm->fault_id 		= strdup(node_val[0]);
@@ -949,27 +1090,27 @@ ps5g_mplane_remove_alarm(sr_session_ctx_t *session,const char *fault_source)
 		{
 			temp=chk->next;
 			chk->next=chk->next->next;
-	char *node_val[7];
+			char *node_val[7];
 
-	node_val[0]=strdup(temp->fault_id);
-	node_val[1]=strdup(temp->fault_source);
-	node_val[2]=strdup(temp->name);
-	node_val[3]=strdup(temp->fault_severity);
-	node_val[4]=strdup("true");
-	node_val[5]=strdup(temp->event_time);
-	node_val[6]=strdup(temp->fault_text);
+			node_val[0]=strdup(temp->fault_id);
+			node_val[1]=strdup(temp->fault_source);
+			node_val[2]=strdup(temp->name);
+			node_val[3]=strdup(temp->fault_severity);
+			node_val[4]=strdup("true");
+			node_val[5]=strdup(temp->event_time);
+			node_val[6]=strdup(temp->fault_text);
 
 
-	rc=ps5g_mplane_send_notification(session,"/o-ran-fm:alarm-notif",node_path,(const char**)node_val,7);
+			rc=ps5g_mplane_send_notification(session,"/o-ran-fm:alarm-notif",node_path,(const char**)node_val,7);
 
-	if(rc != SR_ERR_OK) {
-		printf("could not send alarm notif\n");
-		return SR_ERR_OPERATION_FAILED;
-	}
+			if(rc != SR_ERR_OK) {
+				printf("could not send alarm notif\n");
+				return SR_ERR_OPERATION_FAILED;
+			}
 			free(temp);		
 		}
-	else
-		chk=chk->next;
+		else
+			chk=chk->next;
 	}
 	return rc;
 
@@ -992,7 +1133,7 @@ ssh_session ps5g_mp_connect_ssh(const char *host, const char *user,int verbosity
 			error=strdup("invalid user");
 			ssh_free(session);
 			return NULL;
-		}   
+		}  
 	}
 
 	if (ssh_options_set(session, SSH_OPTIONS_HOST, host) < 0) {
@@ -1000,7 +1141,7 @@ ssh_session ps5g_mp_connect_ssh(const char *host, const char *user,int verbosity
 		error=strdup("invalid host");
 		return NULL;
 	}
-	ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
+	//	ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
 	if(ssh_connect(session)){
 		error=strdup(ssh_get_error(session));
 		printf("Connection failed : %s\n",error);
@@ -1024,6 +1165,7 @@ ssh_session ps5g_mp_connect_ssh(const char *host, const char *user,int verbosity
 	} else if(auth==SSH_AUTH_DENIED){
 		error=strdup("Authentication failed");
 		printf("%s\n",error);
+		return NULL;
 	} else {
 		error=strdup(ssh_get_error(session));
 		printf("Error while authenticating : %s\n",error);
@@ -1185,8 +1327,8 @@ int ps5g_mp_upload_to_remote(ssh_session session,const char *local_file,const ch
 			len=fread(data,1,filesize,from);
 		filesize-=len;
 		//printf("len %d %d\n",len,filesize);
-		puts(".");
-
+		printf(".");
+		fflush(stdout);
 		if (sftp_write(to, data, len) != len) {
 			//			fprintf(stderr, "Error writing %d bytes: %s\n",len, ssh_get_error(session));
 			sprintf(error,"error writing %d bytes %s",len,ssh_get_error(session)); 
@@ -1228,13 +1370,13 @@ int ps5g_mp_download_from_remote(ssh_session session,const char *local_file,cons
 	int filesize;
 
 
-	printf("local_file %s remote_file %s\n",local_file,remote_file);
+	//	printf("local_file %s remote_file %s\n",local_file,remote_file);
 
 	char local_path[MAX_PATH_LEN]={0};
 	strcat(local_path,local_file);
 	strcat(local_path,strrchr(remote_file,'/'));
 
-	printf("local_path %s\n",local_path);
+	//	printf("local_path %s\n",local_path);
 
 	if (!sftp) {
 		//	fprintf(stderr, "sftp error initialising channel: %s\n",ssh_get_error(session));
@@ -1252,7 +1394,7 @@ int ps5g_mp_download_from_remote(ssh_session session,const char *local_file,cons
 		ret=1;
 		goto end;
 	}
-	printf("after sftp_init%d\n",__LINE__);
+	//	printf("after sftp_init%d\n",__LINE__);
 
 	to=fopen(local_path,"w+");
 
@@ -1293,7 +1435,8 @@ int ps5g_mp_download_from_remote(ssh_session session,const char *local_file,cons
 
 		//	printf("len %d %d\n",len,filesize);
 
-		puts(".");
+		printf(".");
+		fflush(stdout);
 
 		if(filesize>SFTP_MAX_RW_SIZE){	
 			len=sftp_read(from, data,SFTP_MAX_RW_SIZE );
@@ -1367,13 +1510,13 @@ int ps5g_mp_download_accept(ssh_session session,const char *local_file,const cha
 	//int filesize;
 
 
-	printf("local_file %s remote_file %s\n",local_file,remote_file);
+	//	printf("local_file %s remote_file %s\n",local_file,remote_file);
 
 	char local_path[MAX_PATH_LEN]={0};
 	strcat(local_path,local_file);
 	strcat(local_path,strrchr(remote_file,'/'));
 
-	printf("local_path %s\n",local_path);
+	//	printf("local_path %s\n",local_path);
 
 	if (!sftp) {
 		sprintf(error,"%s",ssh_get_error(session));
@@ -1434,760 +1577,760 @@ end:
 }
 
 /*copy running config to startup to retain config changes
- made by client after reboot*/
+  made by client after reboot*/
 
 int ps5g_mp_copy_config_to_startup(sr_session_ctx_t *session,const char *module_name)
 {
-	
+
 	printf("copying config from running to starup for %s\n",module_name);
 	sr_datastore_t ds_org=sr_session_get_ds(session);       //get current data_store
-        sr_datastore_t ds;
-        ds =SR_DS_STARTUP;
-        sr_session_switch_ds(session, ds);
-        int c=sr_copy_config(session,module_name,1,0);
-        sr_session_switch_ds(session,ds_org);
+	sr_datastore_t ds;
+	ds =SR_DS_STARTUP;
+	sr_session_switch_ds(session, ds);
+	int c=sr_copy_config(session,module_name,1,0);
+	sr_session_switch_ds(session,ds_org);
 	return c;
 }
 
 
 int ps5g_mp_data_population(sr_session_ctx_t *session, RuntimeConfig* config) {
-				int rc = SR_ERR_OK;
-				//HC
-                                config->numAxc=2;
-                                printf("MP: numAxc  %d\n", config->numAxc);
-                                config->appMode=1;
-                                printf("MP: appMode  %d\n", config->appMode);
-                                config->enableCP=0;
-                                printf("MP: enableCP  %d\n", config->enableCP);
-                                config->enablePrach=0;
-                                printf("MP: enablePrach  %hd\n", config->enablePrach);
-
-
-
-                                sr_val_t *vals=NULL;
-				rc=ps5g_mplane_get_operational_data(session,T2A_MIN_UP,&vals);
-				if(rc==SR_ERR_OK)
-					 {
-					 
-					    config->T2a_min_up = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-					     printf("MP: T2a_min_up  %d\n", config->T2a_min_up);}
-                               
-				else
-					printf("operation failed for T2a_min_up %d\n",rc);
-					
-				rc=ps5g_mplane_get_operational_data(session,T2A_MAX_UP,&vals);
-				if(rc==SR_ERR_OK)
-					 {
-					 
-					     config->T2a_max_up = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-					     printf("MP: T2a_max_up  %d\n", config->T2a_max_up);
-	                       }
-                               
-				else
-					printf("operation failed for T2a_max_up %d\n",rc);
-					
-				rc=ps5g_mplane_get_operational_data(session,T2A_MAX_CP_DL,&vals);
-				if(rc==SR_ERR_OK)
-					 {
-					 
-					     config->T2a_max_cp_dl = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-					     printf("MP: T2a_max_cp_dl  %d\n", config->T2a_max_cp_dl);
-	                       }
-                               
-				else
-					printf("operation failed for T2a_max_cp_dl %d\n",rc);
-					
-					
-				rc=ps5g_mplane_get_operational_data(session,T2A_MIN_CP_DL,&vals);
-				if(rc==SR_ERR_OK)
-					 {
-					 
-					     config->T2a_min_cp_dl = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-					     printf("MP: T2a_min_cp_dl  %d\n", config->T2a_min_cp_dl);
-	                       }
-                               
-				else
-					printf("operation failed for T2a_min_cp_dl %d\n",rc);	
-					
-									
-				rc=ps5g_mplane_get_operational_data(session,T2A_MIN_CP_UL,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->T2a_min_cp_ul = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: T2a_min_cp_ul  %d\n", config->T2a_min_cp_ul);
-                               }
-
-                                else
-                                        printf("operation failed for T2a_min_cp_ul %d\n",rc);	
-
-				rc=ps5g_mplane_get_operational_data(session,T2A_MAX_CP_UL,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->T2a_max_cp_ul = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: T2a_max_cp_ul  %d\n", config->T2a_max_cp_ul);
-                               }
-
-                                else
-                                        printf("operation failed for T2a_max_cp_ul %d\n",rc);
-
-				rc=ps5g_mplane_get_operational_data(session,TADV_CP_DL,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->Tadv_cp_dl = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: Tadv_cp_dl  %d\n", config->Tadv_cp_dl);
-                               }
-
-                                else
-                                        printf("operation failed for Tadv_cp_dl %d\n",rc);																															
-				rc=ps5g_mplane_get_operational_data(session,TA3_MIN,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
+	int rc = SR_ERR_OK;
+	//HC
+	config->numAxc=2;
+	printf("MP: numAxc  %d\n", config->numAxc);
+	config->appMode=1;
+	printf("MP: appMode  %d\n", config->appMode);
+	config->enableCP=0;
+	printf("MP: enableCP  %d\n", config->enableCP);
+	config->enablePrach=0;
+	printf("MP: enablePrach  %hd\n", config->enablePrach);
 
-                                             config->Ta3_min = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: Ta3_min  %d\n", config->Ta3_min);
-                               }
 
-                                else
-                                        printf("operation failed for Ta3_min %d\n",rc);
 
-				rc=ps5g_mplane_get_operational_data(session,TA3_MAX,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
+	sr_val_t *vals=NULL;
+	rc=ps5g_mplane_get_operational_data(session,T2A_MIN_UP,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->T2a_min_up = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T2a_min_up  %d\n", config->T2a_min_up);}
+
+	else
+		printf("operation failed for T2a_min_up %d\n",rc);
 
-                                             config->Ta3_max = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: Ta3_max  %d\n", config->Ta3_max);
-                               }
+	rc=ps5g_mplane_get_operational_data(session,T2A_MAX_UP,&vals);
+	if(rc==SR_ERR_OK)
+	{
 
-                                else
-                                        printf("operation failed for Ta3_max %d\n",rc);
-					
-				
+		config->T2a_max_up = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T2a_max_up  %d\n", config->T2a_max_up);
+	}
 
-				rc=ps5g_mplane_get_running_data(session,T1A_MAX_CP_DL,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
+	else
+		printf("operation failed for T2a_max_up %d\n",rc);
 
-                                             config->T1a_max_cp_dl = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: T1a_max_cp_dl  %d\n", config->T1a_max_cp_dl);
-                               }
+	rc=ps5g_mplane_get_operational_data(session,T2A_MAX_CP_DL,&vals);
+	if(rc==SR_ERR_OK)
+	{
 
-                                else
-                                        printf("operation failed for T1a_max_cp_dl %d\n",rc);
+		config->T2a_max_cp_dl = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T2a_max_cp_dl  %d\n", config->T2a_max_cp_dl);
+	}
 
+	else
+		printf("operation failed for T2a_max_cp_dl %d\n",rc);
 
-                                rc=ps5g_mplane_get_running_data(session,T1A_MAX_UP,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->T1a_max_up = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: T1a_max_up  %d\n", config->T1a_max_up);
-                               }
-
-                                else
-                                        printf("operation failed for T1a_max_up %d\n",rc);
 
-				
-				rc=ps5g_mplane_get_running_data(session,TA4_MAX,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->Ta4_max = ((vals)->data.uint32_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: Ta4_max  %d\n", config->Ta4_max);
-                               }
+	rc=ps5g_mplane_get_operational_data(session,T2A_MIN_CP_DL,&vals);
+	if(rc==SR_ERR_OK)
+	{
 
-                                else
-                                        printf("operation failed for Ta4_max %d\n",rc);
+		config->T2a_min_cp_dl = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T2a_min_cp_dl  %d\n", config->T2a_min_cp_dl);
+	}
 
+	else
+		printf("operation failed for T2a_min_cp_dl %d\n",rc);	
 
-                                rc=ps5g_mplane_get_operational_data(session,NDLABSFREPOINTA,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->nDLAbsFrePointA = ((vals)->data.uint64_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: nDLAbsFrePointA  %d\n", config->nDLAbsFrePointA);
-                               }
-
-                                else
-                                        printf("operation failed for nDLAbsFrePointA %d\n",rc);
-
-
-
-				rc=ps5g_mplane_get_operational_data(session,NULABSFREPOINTA,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->nULAbsFrePointA = ((vals)->data.uint64_val)/1000;
-					if CONFIG_PRINT
-                                             printf("MP: nULAbsFrePointA  %d\n", config->nULAbsFrePointA);
-                               }
-
-                                else
-                                        printf("operation failed for nULAbsFrePointA %d\n",rc);
-
-
-                                rc=ps5g_mplane_get_operational_data(session,NDLBANDWIDTH,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->nDLBandwidth = ((vals)->data.uint64_val)/1000000;
-					if CONFIG_PRINT
-                                             printf("MP: nDLBandwidth  %d\n", config->nDLBandwidth);
-                               }
 
-                                else
-                                        printf("operation failed for nDLBandwidth %d\n",rc);
+	rc=ps5g_mplane_get_operational_data(session,T2A_MIN_CP_UL,&vals);
+	if(rc==SR_ERR_OK)
+	{
 
+		config->T2a_min_cp_ul = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T2a_min_cp_ul  %d\n", config->T2a_min_cp_ul);
+	}
 
+	else
+		printf("operation failed for T2a_min_cp_ul %d\n",rc);	
 
-				rc=ps5g_mplane_get_operational_data(session,NULBANDWIDTH,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->nULBandwidth = ((vals)->data.uint64_val)/1000000;
-					if CONFIG_PRINT
-                                             printf("MP: nULBandwidth  %d\n", config->nULBandwidth);
-                               }
-
-                                else
-                                        printf("operation failed for nULBandwidth %d\n",rc);
-                                        
-                                        
-                                        
-                               rc=ps5g_mplane_get_operational_data(session,NDLFFTSIZE,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-                                             if((vals)->data.uint64_val >=192 && (vals)->data.uint64_val <= 207){
-                                             		config->nDLFftSize = 4096;
-                                             }
-					if CONFIG_PRINT
-                                             printf("MP: nDLFftSize  %d\n", config->nDLFftSize);
-                               }
-
-                                else
-                                        printf("operation failed for nDLFftSize %d\n",rc);
-                                        
-                                        
-                               rc=ps5g_mplane_get_operational_data(session,NDLFFTSIZE,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-                                             if((vals)->data.uint64_val >=192 && (vals)->data.uint64_val <= 207){
-                                             		config->nULFftSize = 4096;
-                                             }
-					if CONFIG_PRINT
-                                             printf("MP: nULFftSize  %d\n", config->nULFftSize);
-                               }
-
-                                else
-                                        printf("operation failed for nULFftSize %d\n",rc);
-
-
-                                rc=ps5g_mplane_get_operational_data(session,MTUSIZE,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->mtu = (vals)->data.uint16_val;
-					if CONFIG_PRINT
-                                             printf("MP: mtu  %d\n", config->mtu);
-                               }
-
-                                else
-                                        printf("operation failed for mtu %d\n",rc);
-
-
-				rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
-                                if(rc==SR_ERR_OK){
-					if(strcmp((vals)->data.enum_val,"NO_COMPRESSION")==0){
-                                        		config->compression=0;
-                                        	}
-                                        	else{
-                                        		config->compression=1;
-                                        	}
-                                        printf("MP: Compression  %d\n", config->compression);	
-                                }
-                                else
-                                        printf("operation failed for Compression %d\n",rc);
-
-				rc=ps5g_mplane_get_operational_data(session,MAXFRAMEID,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->maxFrameId = (vals)->data.uint16_val;
-					if CONFIG_PRINT
-                                             printf("MP: maxFrameId  %d\n", config->maxFrameId);
-                               }
-
-                                else
-                                        printf("operation failed for maxFrameId %d\n",rc);
-
-
-                                rc=ps5g_mplane_get_operational_data(session,PRACHCONFIGINDEX,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-
-                                             config->prachConfigIndex = (vals)->data.uint8_val;
-					if CONFIG_PRINT
-                                             printf("MP: prachConfigIndex  %d\n", config->prachConfigIndex);
-                               }
-
-                                else
-                                        printf("operation failed for prachConfigIndex %d\n",rc);
-
-
-
-				rc=ps5g_mplane_get_operational_data(session,XRANMODE,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-						if(strcmp((vals)->data.enum_val,"CAT_A")==0){
-							config->xranCat=0;
-						}
-						else if(strcmp((vals)->data.enum_val,"CAT_B")==0){
-							config->xranCat=1;
-						}
-					if CONFIG_PRINT
-                                             printf("MP: xranmode  %d\n", config->xranCat);
-                               }
-
-                                else
-                                        printf("operation failed for xranmode %d\n",rc);
-
-
-				rc=ps5g_mplane_get_operational_data(session,NFRAMEDUPLEXTYPE,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-						if(strcmp((vals)->data.enum_val,"FDD")==0){
-							config->nFrameDuplexType=0;
-						}
-						else if(strcmp((vals)->data.enum_val,"TDD")==0){
-							config->nFrameDuplexType=1;
-						}
-					if CONFIG_PRINT
-                                             printf("MP: nFrameDuplexType  %d\n", config->nFrameDuplexType);
-                               }
-
-                                else
-                                        printf("operation failed for nFrameDuplexType %d\n",rc);
-                                        
-                                        
-				rc=ps5g_mplane_get_operational_data(session,CCNUM,&vals);
-                                if(rc==SR_ERR_OK){
-					config->numCC = ((vals)->data.uint8_val)/16;
-					printf("MP: CCNum  %d\n", config->numCC);
-                               }
-
-                                else
-                                        printf("operation failed for CCNum %d\n",rc);
-
-
-
-				config->PrbMapDl.nPrbElm=2;     //nPrbElemDl
-                                printf("MP: nPrbElemDl  %d\n", config->PrbMapDl.nPrbElm);
-				struct xran_prb_elm *pPrbElem = &config->PrbMapDl.prbMap[0];
-				printf("PrbElemDl0: ");
-				rc=SR_ERR_OK;
-					rc=ps5g_mplane_get_operational_data(session,NRBSTART0,&vals);
-        	                        if(rc==SR_ERR_OK){
-                	                        pPrbElem->nRBStart = (vals)->data.uint8_val;
-                        	                printf("nRBStart %d, ", pPrbElem->nRBStart);
-                               		}
-
-                               		 else{
-                                        	printf("operation failed for nRBStart %d\n",rc);
+	rc=ps5g_mplane_get_operational_data(session,T2A_MAX_CP_UL,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->T2a_max_cp_ul = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T2a_max_cp_ul  %d\n", config->T2a_max_cp_ul);
+	}
+
+	else
+		printf("operation failed for T2a_max_cp_ul %d\n",rc);
+
+	rc=ps5g_mplane_get_operational_data(session,TADV_CP_DL,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->Tadv_cp_dl = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: Tadv_cp_dl  %d\n", config->Tadv_cp_dl);
+	}
+
+	else
+		printf("operation failed for Tadv_cp_dl %d\n",rc);																															
+	rc=ps5g_mplane_get_operational_data(session,TA3_MIN,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->Ta3_min = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: Ta3_min  %d\n", config->Ta3_min);
+	}
+
+	else
+		printf("operation failed for Ta3_min %d\n",rc);
+
+	rc=ps5g_mplane_get_operational_data(session,TA3_MAX,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->Ta3_max = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: Ta3_max  %d\n", config->Ta3_max);
+	}
+
+	else
+		printf("operation failed for Ta3_max %d\n",rc);
+
+
+
+	rc=ps5g_mplane_get_running_data(session,T1A_MAX_CP_DL,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->T1a_max_cp_dl = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T1a_max_cp_dl  %d\n", config->T1a_max_cp_dl);
+	}
+
+	else
+		printf("operation failed for T1a_max_cp_dl %d\n",rc);
+
+
+	rc=ps5g_mplane_get_running_data(session,T1A_MAX_UP,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->T1a_max_up = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: T1a_max_up  %d\n", config->T1a_max_up);
+	}
+
+	else
+		printf("operation failed for T1a_max_up %d\n",rc);
+
+
+	rc=ps5g_mplane_get_running_data(session,TA4_MAX,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->Ta4_max = ((vals)->data.uint32_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: Ta4_max  %d\n", config->Ta4_max);
+	}
+
+	else
+		printf("operation failed for Ta4_max %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NDLABSFREPOINTA,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->nDLAbsFrePointA = ((vals)->data.uint64_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: nDLAbsFrePointA  %d\n", config->nDLAbsFrePointA);
+	}
+
+	else
+		printf("operation failed for nDLAbsFrePointA %d\n",rc);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,NULABSFREPOINTA,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->nULAbsFrePointA = ((vals)->data.uint64_val)/1000;
+		if CONFIG_PRINT
+			printf("MP: nULAbsFrePointA  %d\n", config->nULAbsFrePointA);
+	}
+
+	else
+		printf("operation failed for nULAbsFrePointA %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NDLBANDWIDTH,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->nDLBandwidth = ((vals)->data.uint64_val)/1000000;
+		if CONFIG_PRINT
+			printf("MP: nDLBandwidth  %d\n", config->nDLBandwidth);
+	}
+
+	else
+		printf("operation failed for nDLBandwidth %d\n",rc);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,NULBANDWIDTH,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->nULBandwidth = ((vals)->data.uint64_val)/1000000;
+		if CONFIG_PRINT
+			printf("MP: nULBandwidth  %d\n", config->nULBandwidth);
+	}
+
+	else
+		printf("operation failed for nULBandwidth %d\n",rc);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,NDLFFTSIZE,&vals);
+	if(rc==SR_ERR_OK)
+	{
+		if((vals)->data.uint64_val >=192 && (vals)->data.uint64_val <= 207){
+			config->nDLFftSize = 4096;
+		}
+		if CONFIG_PRINT
+			printf("MP: nDLFftSize  %d\n", config->nDLFftSize);
+	}
+
+	else
+		printf("operation failed for nDLFftSize %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NDLFFTSIZE,&vals);
+	if(rc==SR_ERR_OK)
+	{
+		if((vals)->data.uint64_val >=192 && (vals)->data.uint64_val <= 207){
+			config->nULFftSize = 4096;
+		}
+		if CONFIG_PRINT
+			printf("MP: nULFftSize  %d\n", config->nULFftSize);
+	}
+
+	else
+		printf("operation failed for nULFftSize %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,MTUSIZE,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->mtu = (vals)->data.uint16_val;
+		if CONFIG_PRINT
+			printf("MP: mtu  %d\n", config->mtu);
+	}
+
+	else
+		printf("operation failed for mtu %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
+	if(rc==SR_ERR_OK){
+		if(strcmp((vals)->data.enum_val,"NO_COMPRESSION")==0){
+			config->compression=0;
+		}
+		else{
+			config->compression=1;
+		}
+		printf("MP: Compression  %d\n", config->compression);	
+	}
+	else
+		printf("operation failed for Compression %d\n",rc);
+
+	rc=ps5g_mplane_get_operational_data(session,MAXFRAMEID,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->maxFrameId = (vals)->data.uint16_val;
+		if CONFIG_PRINT
+			printf("MP: maxFrameId  %d\n", config->maxFrameId);
+	}
+
+	else
+		printf("operation failed for maxFrameId %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,PRACHCONFIGINDEX,&vals);
+	if(rc==SR_ERR_OK)
+	{
+
+		config->prachConfigIndex = (vals)->data.uint8_val;
+		if CONFIG_PRINT
+			printf("MP: prachConfigIndex  %d\n", config->prachConfigIndex);
+	}
+
+	else
+		printf("operation failed for prachConfigIndex %d\n",rc);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,XRANMODE,&vals);
+	if(rc==SR_ERR_OK)
+	{
+		if(strcmp((vals)->data.enum_val,"CAT_A")==0){
+			config->xranCat=0;
+		}
+		else if(strcmp((vals)->data.enum_val,"CAT_B")==0){
+			config->xranCat=1;
+		}
+		if CONFIG_PRINT
+			printf("MP: xranmode  %d\n", config->xranCat);
+	}
+
+	else
+		printf("operation failed for xranmode %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NFRAMEDUPLEXTYPE,&vals);
+	if(rc==SR_ERR_OK)
+	{
+		if(strcmp((vals)->data.enum_val,"FDD")==0){
+			config->nFrameDuplexType=0;
+		}
+		else if(strcmp((vals)->data.enum_val,"TDD")==0){
+			config->nFrameDuplexType=1;
+		}
+		if CONFIG_PRINT
+			printf("MP: nFrameDuplexType  %d\n", config->nFrameDuplexType);
+	}
+
+	else
+		printf("operation failed for nFrameDuplexType %d\n",rc);
+
+
+	rc=ps5g_mplane_get_operational_data(session,CCNUM,&vals);
+	if(rc==SR_ERR_OK){
+		config->numCC = ((vals)->data.uint8_val)/16;
+		printf("MP: CCNum  %d\n", config->numCC);
+	}
+
+	else
+		printf("operation failed for CCNum %d\n",rc);
+
+
+
+	config->PrbMapDl.nPrbElm=2;     //nPrbElemDl
+	printf("MP: nPrbElemDl  %d\n", config->PrbMapDl.nPrbElm);
+	struct xran_prb_elm *pPrbElem = &config->PrbMapDl.prbMap[0];
+	printf("PrbElemDl0: ");
+	rc=SR_ERR_OK;
+	rc=ps5g_mplane_get_operational_data(session,NRBSTART0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBStart = (vals)->data.uint8_val;
+		printf("nRBStart %d, ", pPrbElem->nRBStart);
+	}
+
+	else{
+		printf("operation failed for nRBStart %d\n",rc);
+	}
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,NRBSIZE0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBSize = (vals)->data.uint8_val;
+		printf("nRBSize  %d, ", pPrbElem->nRBSize);
+	}
+
+	else{
+		printf("operation failed for nRBSize %d\n",rc);
+	}
+
+
+	pPrbElem->nStartSymb=0;
+	printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NUMSYMB0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->numSymb = (vals)->data.uint8_val;
+		printf("numSymb  %d, ", pPrbElem->numSymb);
+	}
+
+	else{
+		printf("operation failed for numSymb %d\n",rc);
+	}
+
+	rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nBeamIndex = (vals)->data.uint8_val;
+		printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
+	}
+
+	else{
+		printf("operation failed for nBeamIndex %d\n",rc);
+	}
+
+
+	pPrbElem->bf_weight_update=1;
+	printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
+	if(rc==SR_ERR_OK){
+		if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
+			pPrbElem->compMethod=1;
+		}
+		else{
+			pPrbElem->compMethod=0;
+		}                                               
+		printf("compMethod  %d, ", pPrbElem->compMethod);
+	}
+
+	else{
+		printf("operation failed for compMethod %d\n",rc);
+	}
+
+
+	rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->iqWidth=(vals)->data.uint8_val;
+		printf("iqWidth  %d, ", pPrbElem->iqWidth);
+	}
+
+	else{
+		printf("operation failed for iqWidth %d\n",rc);
+	}
+
+	pPrbElem->BeamFormingType=1;
+	printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
+
+	pPrbElem = &config->PrbMapDl.prbMap[1];
+	printf("PrbElemDl1: ");
+	rc=SR_ERR_OK;
+	rc=ps5g_mplane_get_operational_data(session,NRBSTART1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBStart = (vals)->data.uint8_val;
+		printf("nRBStart %d, ", pPrbElem->nRBStart);
+	}
+
+	else{
+		printf("operation failed for nRBStart %d\n",rc);
+	}
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,NRBSIZE1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBSize = (vals)->data.uint8_val;
+		printf("nRBSize  %d, ", pPrbElem->nRBSize);
+	}
+
+	else{
+		printf("operation failed for nRBSize %d\n",rc);
+	}
+
+
+	pPrbElem->nStartSymb=0;
+	printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NUMSYMB1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->numSymb = (vals)->data.uint8_val;
+		printf("numSymb  %d, ", pPrbElem->numSymb);
+	}
+
+	else{
+		printf("operation failed for numSymb %d\n",rc);
+	}
+
+	rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nBeamIndex = (vals)->data.uint8_val;
+		printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
+	}
+
+	else{
+		printf("operation failed for nBeamIndex %d\n",rc);
+	}
+
+
+	pPrbElem->bf_weight_update=1;
+	printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
+	if(rc==SR_ERR_OK){
+		if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
+			pPrbElem->compMethod=1;
+		}
+		else{
+			pPrbElem->compMethod=0;
+		}                                               
+		printf("compMethod  %d, ", pPrbElem->compMethod);
+	}
+
+	else{
+		printf("operation failed for compMethod %d\n",rc);
+	}
+
+
+	rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->iqWidth=(vals)->data.uint8_val;
+		printf("iqWidth  %d, ", pPrbElem->iqWidth);
+	}
+
+	else{
+		printf("operation failed for iqWidth %d\n",rc);
+	}
+
+	pPrbElem->BeamFormingType=1;
+	printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
+
+
+
+	config->PrbMapUl.nPrbElm=2;     //nPrbElemUl
+	printf("MP: nPrbElemUl  %d\n", config->PrbMapUl.nPrbElm);
+	pPrbElem = &config->PrbMapUl.prbMap[0];
+	printf("PrbElemUl0: ");
+	rc=SR_ERR_OK;
+	rc=ps5g_mplane_get_operational_data(session,NRBSTART0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBStart = (vals)->data.uint8_val;
+		printf("nRBStart %d, ", pPrbElem->nRBStart);
+	}
+
+	else{
+		printf("operation failed for nRBStart %d\n",rc);
+	}
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,NRBSIZE0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBSize = (vals)->data.uint8_val;
+		printf("nRBSize  %d, ", pPrbElem->nRBSize);
+	}
+
+	else{
+		printf("operation failed for nRBSize %d\n",rc);
+	}
+
+
+	pPrbElem->nStartSymb=0;
+	printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NUMSYMB0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->numSymb = (vals)->data.uint8_val;
+		printf("numSymb  %d, ", pPrbElem->numSymb);
+	}
+
+	else{
+		printf("operation failed for numSymb %d\n",rc);
+	}
+
+	rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX0,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nBeamIndex = (vals)->data.uint8_val;
+		printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
+	}
+
+	else{
+		printf("operation failed for nBeamIndex %d\n",rc);
+	}
+
+
+	pPrbElem->bf_weight_update=1;
+	printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
+	if(rc==SR_ERR_OK){
+		if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
+			pPrbElem->compMethod=1;
+		}
+		else{
+			pPrbElem->compMethod=0;
+		}                                               
+		printf("compMethod  %d, ", pPrbElem->compMethod);
+	}
+
+	else{
+		printf("operation failed for compMethod %d\n",rc);
+	}
+
+
+	rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->iqWidth=(vals)->data.uint8_val;
+		printf("iqWidth  %d, ", pPrbElem->iqWidth);
+	}
+
+	else{
+		printf("operation failed for iqWidth %d\n",rc);
+	}
+
+	pPrbElem->BeamFormingType=1;
+	printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
+
+	pPrbElem = &config->PrbMapUl.prbMap[1];
+	printf("PrbElemUl1: ");
+	rc=SR_ERR_OK;
+	rc=ps5g_mplane_get_operational_data(session,NRBSTART1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBStart = (vals)->data.uint8_val;
+		printf("nRBStart %d, ", pPrbElem->nRBStart);
+	}
+
+	else{
+		printf("operation failed for nRBStart %d\n",rc);
+	}
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,NRBSIZE1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nRBSize = (vals)->data.uint8_val;
+		printf("nRBSize  %d, ", pPrbElem->nRBSize);
+	}
+
+	else{
+		printf("operation failed for nRBSize %d\n",rc);
+	}
+
+
+	pPrbElem->nStartSymb=0;
+	printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
+
+
+	rc=ps5g_mplane_get_operational_data(session,NUMSYMB1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->numSymb = (vals)->data.uint8_val;
+		printf("numSymb  %d, ", pPrbElem->numSymb);
+	}
+
+	else{
+		printf("operation failed for numSymb %d\n",rc);
+	}
+
+	rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX1,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->nBeamIndex = (vals)->data.uint8_val;
+		printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
+	}
+
+	else{
+		printf("operation failed for nBeamIndex %d\n",rc);
+	}
+
+
+	pPrbElem->bf_weight_update=1;
+	printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
+
+
+
+	rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
+	if(rc==SR_ERR_OK){
+		if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
+			pPrbElem->compMethod=1;
+		}
+		else{
+			pPrbElem->compMethod=0;
+		}                                               
+		printf("compMethod  %d, ", pPrbElem->compMethod);
+	}
+
+	else{
+		printf("operation failed for compMethod %d\n",rc);
+	}
+
+
+	rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
+	if(rc==SR_ERR_OK){
+		pPrbElem->iqWidth=(vals)->data.uint8_val;
+		printf("iqWidth  %d, ", pPrbElem->iqWidth);
+	}
+
+	else{
+		printf("operation failed for iqWidth %d\n",rc);
+	}
+
+	pPrbElem->BeamFormingType=1;
+	printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
+
+
+	rc=ps5g_mplane_get_operational_data(session,SCS,&vals);
+	if(rc==SR_ERR_OK)
+	{
+		if((vals)->data.uint32_val==30000){
+			config->mu_number=1;
+		}
+		else if((vals)->data.uint32_val==120000){
+			config->mu_number=3;
+		}
+
+		printf("MP: mu  %d\n", config->mu_number);
+	}
+
+	else
+		printf("operation failed for mu %d\n",rc);
+
+
+	/*				rc=ps5g_mplane_get_operational_data(session,RUMAC0,&vals);
+					if(rc==SR_ERR_OK){
+					sscanf(vals, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", 
+					&config->o_du_addr[0].addr_bytes[0],
+					&config->o_du_addr[0].addr_bytes[1],
+					&config->o_du_addr[0].addr_bytes[2],
+					&config->o_du_addr[0].addr_bytes[3],
+					&config->o_du_addr[0].addr_bytes[4],
+					&config->o_du_addr[0].addr_bytes[5]);
+
+
+					printf("MP: [vf %d]O-DU MAC address: %02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx\n",
+					,
+					config->o_du_addr[vf_num].addr_bytes[0],
+					config->o_du_addr[vf_num].addr_bytes[1],
+					config->o_du_addr[vf_num].addr_bytes[2],
+					config->o_du_addr[vf_num].addr_bytes[3],
+					config->o_du_addr[vf_num].addr_bytes[4],
+					config->o_du_addr[vf_num].addr_bytes[5]);
 					}
 
-
-
-					rc=ps5g_mplane_get_operational_data(session,NRBSIZE0,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nRBSize = (vals)->data.uint8_val;
-                                                printf("nRBSize  %d, ", pPrbElem->nRBSize);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nRBSize %d\n",rc);
-                                   }
-
-
-					pPrbElem->nStartSymb=0;
-                                        printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
-					
-
-					rc=ps5g_mplane_get_operational_data(session,NUMSYMB0,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->numSymb = (vals)->data.uint8_val;
-                                                printf("numSymb  %d, ", pPrbElem->numSymb);
-                                        }
-
-                                         else{
-                                                printf("operation failed for numSymb %d\n",rc);
-                                        }
-
-					rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX0,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nBeamIndex = (vals)->data.uint8_val;
-                                                printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nBeamIndex %d\n",rc);
-                                        }
-
-
-					pPrbElem->bf_weight_update=1;
-                                        printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
-
-
-
-					rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
-                                        if(rc==SR_ERR_OK){
-						if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
-                                                        pPrbElem->compMethod=1;
-                                                }
-                                                else{
-                                                        pPrbElem->compMethod=0;
-                                                }                                               
-                                                printf("compMethod  %d, ", pPrbElem->compMethod);
-                                        }
-
-                                         else{
-                                                printf("operation failed for compMethod %d\n",rc);
-                                        }
-
-
-					rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->iqWidth=(vals)->data.uint8_val;
-                                                printf("iqWidth  %d, ", pPrbElem->iqWidth);
-                                        }
-
-                                         else{
-                                                printf("operation failed for iqWidth %d\n",rc);
-                                        }
-					
-					pPrbElem->BeamFormingType=1;
-                                        printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
-                                        
-                                        pPrbElem = &config->PrbMapDl.prbMap[1];
-                               printf("PrbElemDl1: ");
-				rc=SR_ERR_OK;
-					rc=ps5g_mplane_get_operational_data(session,NRBSTART1,&vals);
-        	                        if(rc==SR_ERR_OK){
-                	                        pPrbElem->nRBStart = (vals)->data.uint8_val;
-                        	                printf("nRBStart %d, ", pPrbElem->nRBStart);
-                               		}
-
-                               		 else{
-                                        	printf("operation failed for nRBStart %d\n",rc);
+					else{
+					printf("operation failed for iqWidth %d\n",rc);
 					}
 
+	 */				
 
 
-					rc=ps5g_mplane_get_operational_data(session,NRBSIZE1,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nRBSize = (vals)->data.uint8_val;
-                                                printf("nRBSize  %d, ", pPrbElem->nRBSize);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nRBSize %d\n",rc);
-                                   }
-
-
-					pPrbElem->nStartSymb=0;
-                                        printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
-					
-
-					rc=ps5g_mplane_get_operational_data(session,NUMSYMB1,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->numSymb = (vals)->data.uint8_val;
-                                                printf("numSymb  %d, ", pPrbElem->numSymb);
-                                        }
-
-                                         else{
-                                                printf("operation failed for numSymb %d\n",rc);
-                                        }
-
-					rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX1,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nBeamIndex = (vals)->data.uint8_val;
-                                                printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nBeamIndex %d\n",rc);
-                                        }
-
-
-					pPrbElem->bf_weight_update=1;
-                                        printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
-
-
-
-					rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
-                                        if(rc==SR_ERR_OK){
-						if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
-                                                        pPrbElem->compMethod=1;
-                                                }
-                                                else{
-                                                        pPrbElem->compMethod=0;
-                                                }                                               
-                                                printf("compMethod  %d, ", pPrbElem->compMethod);
-                                        }
-
-                                         else{
-                                                printf("operation failed for compMethod %d\n",rc);
-                                        }
-
-
-					rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->iqWidth=(vals)->data.uint8_val;
-                                                printf("iqWidth  %d, ", pPrbElem->iqWidth);
-                                        }
-
-                                         else{
-                                                printf("operation failed for iqWidth %d\n",rc);
-                                        }
-					
-					pPrbElem->BeamFormingType=1;
-                                        printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
-
-
-
-				config->PrbMapUl.nPrbElm=2;     //nPrbElemUl
-                                printf("MP: nPrbElemUl  %d\n", config->PrbMapUl.nPrbElm);
-                                pPrbElem = &config->PrbMapUl.prbMap[0];
-                                printf("PrbElemUl0: ");
-				rc=SR_ERR_OK;
-					rc=ps5g_mplane_get_operational_data(session,NRBSTART0,&vals);
-        	                        if(rc==SR_ERR_OK){
-                	                        pPrbElem->nRBStart = (vals)->data.uint8_val;
-                        	                printf("nRBStart %d, ", pPrbElem->nRBStart);
-                               		}
-
-                               		 else{
-                                        	printf("operation failed for nRBStart %d\n",rc);
-					}
-
-
-
-					rc=ps5g_mplane_get_operational_data(session,NRBSIZE0,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nRBSize = (vals)->data.uint8_val;
-                                                printf("nRBSize  %d, ", pPrbElem->nRBSize);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nRBSize %d\n",rc);
-                                   }
-
-
-					pPrbElem->nStartSymb=0;
-                                        printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
-					
-
-					rc=ps5g_mplane_get_operational_data(session,NUMSYMB0,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->numSymb = (vals)->data.uint8_val;
-                                                printf("numSymb  %d, ", pPrbElem->numSymb);
-                                        }
-
-                                         else{
-                                                printf("operation failed for numSymb %d\n",rc);
-                                        }
-
-					rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX0,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nBeamIndex = (vals)->data.uint8_val;
-                                                printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nBeamIndex %d\n",rc);
-                                        }
-
-
-					pPrbElem->bf_weight_update=1;
-                                        printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
-
-
-
-					rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
-                                        if(rc==SR_ERR_OK){
-						if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
-                                                        pPrbElem->compMethod=1;
-                                                }
-                                                else{
-                                                        pPrbElem->compMethod=0;
-                                                }                                               
-                                                printf("compMethod  %d, ", pPrbElem->compMethod);
-                                        }
-
-                                         else{
-                                                printf("operation failed for compMethod %d\n",rc);
-                                        }
-
-
-					rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->iqWidth=(vals)->data.uint8_val;
-                                                printf("iqWidth  %d, ", pPrbElem->iqWidth);
-                                        }
-
-                                         else{
-                                                printf("operation failed for iqWidth %d\n",rc);
-                                        }
-					
-					pPrbElem->BeamFormingType=1;
-                                        printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
-                                        
-                                        pPrbElem = &config->PrbMapUl.prbMap[1];
-                               printf("PrbElemUl1: ");
-				rc=SR_ERR_OK;
-					rc=ps5g_mplane_get_operational_data(session,NRBSTART1,&vals);
-        	                        if(rc==SR_ERR_OK){
-                	                        pPrbElem->nRBStart = (vals)->data.uint8_val;
-                        	                printf("nRBStart %d, ", pPrbElem->nRBStart);
-                               		}
-
-                               		 else{
-                                        	printf("operation failed for nRBStart %d\n",rc);
-					}
-
-
-
-					rc=ps5g_mplane_get_operational_data(session,NRBSIZE1,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nRBSize = (vals)->data.uint8_val;
-                                                printf("nRBSize  %d, ", pPrbElem->nRBSize);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nRBSize %d\n",rc);
-                                   }
-
-
-					pPrbElem->nStartSymb=0;
-                                        printf("nStartSymb  %d, ", pPrbElem->nStartSymb);
-					
-
-					rc=ps5g_mplane_get_operational_data(session,NUMSYMB1,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->numSymb = (vals)->data.uint8_val;
-                                                printf("numSymb  %d, ", pPrbElem->numSymb);
-                                        }
-
-                                         else{
-                                                printf("operation failed for numSymb %d\n",rc);
-                                        }
-
-					rc=ps5g_mplane_get_operational_data(session,NBEAMINDEX1,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->nBeamIndex = (vals)->data.uint8_val;
-                                                printf("nBeamIndex  %d, ", pPrbElem->nBeamIndex);
-                                        }
-
-                                         else{
-                                                printf("operation failed for nBeamIndex %d\n",rc);
-                                        }
-
-
-					pPrbElem->bf_weight_update=1;
-                                        printf("bf_weight_update  %d, ", pPrbElem->bf_weight_update);
-
-
-
-					rc=ps5g_mplane_get_operational_data(session,CMPMTHD,&vals);
-                                        if(rc==SR_ERR_OK){
-						if(strcmp((vals)->data.enum_val,"BLOCK_FLOATING_POINT")==0){
-                                                        pPrbElem->compMethod=1;
-                                                }
-                                                else{
-                                                        pPrbElem->compMethod=0;
-                                                }                                               
-                                                printf("compMethod  %d, ", pPrbElem->compMethod);
-                                        }
-
-                                         else{
-                                                printf("operation failed for compMethod %d\n",rc);
-                                        }
-
-
-					rc=ps5g_mplane_get_operational_data(session,IQWIDTH,&vals);
-                                        if(rc==SR_ERR_OK){
-                                                pPrbElem->iqWidth=(vals)->data.uint8_val;
-                                                printf("iqWidth  %d, ", pPrbElem->iqWidth);
-                                        }
-
-                                         else{
-                                                printf("operation failed for iqWidth %d\n",rc);
-                                        }
-					
-					pPrbElem->BeamFormingType=1;
-                                        printf("BeamFormingType  %d\n", pPrbElem->BeamFormingType);
-
-
-                              	rc=ps5g_mplane_get_operational_data(session,SCS,&vals);
-                                if(rc==SR_ERR_OK)
-                                         {
-                                                if((vals)->data.uint32_val==30000){
-                                                        config->mu_number=1;
-                                                }
-                                                else if((vals)->data.uint32_val==120000){
-                                                        config->mu_number=3;
-                                                }
-
-                                             printf("MP: mu  %d\n", config->mu_number);
-                               }
-
-                                else
-                                        printf("operation failed for mu %d\n",rc);
-				
-				
-/*				rc=ps5g_mplane_get_operational_data(session,RUMAC0,&vals);
-                                        if(rc==SR_ERR_OK){
-                                        sscanf(vals, "%02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx", 
-                                        	&config->o_du_addr[0].addr_bytes[0],
-                                              &config->o_du_addr[0].addr_bytes[1],
-                                              &config->o_du_addr[0].addr_bytes[2],
-                                              &config->o_du_addr[0].addr_bytes[3],
-                                              &config->o_du_addr[0].addr_bytes[4],
-                                              &config->o_du_addr[0].addr_bytes[5]);
-                                        
-                                        
-                                              printf("MP: [vf %d]O-DU MAC address: %02hhx:%02hhx:%02hhx:%02hhx:%02hhx:%02hhx\n",
-                ,
-                config->o_du_addr[vf_num].addr_bytes[0],
-                config->o_du_addr[vf_num].addr_bytes[1],
-                config->o_du_addr[vf_num].addr_bytes[2],
-                config->o_du_addr[vf_num].addr_bytes[3],
-                config->o_du_addr[vf_num].addr_bytes[4],
-                config->o_du_addr[vf_num].addr_bytes[5]);
-                                        }
-
-                                         else{
-                                                printf("operation failed for iqWidth %d\n",rc);
-                                        }
-				
-*/				
-				
-				
-				return 0;
+	return 0;
 
 }
 
