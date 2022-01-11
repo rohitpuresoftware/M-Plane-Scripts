@@ -1,3 +1,5 @@
 <software-install xmlns="urn:o-ran:software-management:1.0">
-    <slot-name>SOFTWARE_SLOT1_RUNNING</slot-name>
+    <slot-name>SOFTWARE_SLOT2</slot-name>
+    <file-names>ps5g_ru_release.zip</file-names>
+
 </software-install>

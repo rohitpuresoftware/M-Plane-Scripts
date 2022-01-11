@@ -1,0 +1,361 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ALLOC	unzip.c	112;"	d	file:
+BUFREADCOMMENT	unzip.c	405;"	d	file:
+CASESENSITIVITYDEFAULTVALUE	unzip.c	372;"	d	file:
+CASESENSITIVITYDEFAULTVALUE	unzip.c	374;"	d	file:
+CASESENSITIVITYDEFAULT_NO	unzip.c	98;"	d	file:
+CC	Makefile	/^CC=gcc$/;"	m
+DATA_ORDER_IS_LITTLE_ENDIAN	md5_local.h	28;"	d
+F	md5_local.h	57;"	d
+FOPEN_FUNC	ioapi.c	19;"	d	file:
+FOPEN_FUNC	ioapi.c	23;"	d	file:
+FOPEN_FUNC	parse_xml_for_software_download.c	20;"	d	file:
+FOPEN_FUNC	parse_xml_for_software_download.c	24;"	d	file:
+FSEEKO_FUNC	ioapi.c	21;"	d	file:
+FSEEKO_FUNC	ioapi.c	25;"	d	file:
+FSEEKO_FUNC	parse_xml_for_software_download.c	22;"	d	file:
+FSEEKO_FUNC	parse_xml_for_software_download.c	26;"	d	file:
+FTELLO_FUNC	ioapi.c	20;"	d	file:
+FTELLO_FUNC	ioapi.c	24;"	d	file:
+FTELLO_FUNC	parse_xml_for_software_download.c	21;"	d	file:
+FTELLO_FUNC	parse_xml_for_software_download.c	25;"	d	file:
+G	md5_local.h	58;"	d
+H	md5_local.h	59;"	d
+HASH_BLOCK_DATA_ORDER	md5_local.h	43;"	d
+HASH_CBLOCK	md5_local.h	32;"	d
+HASH_CTX	md5_local.h	31;"	d
+HASH_FINAL	md32_common.h	/^int HASH_FINAL (unsigned char *md, HASH_CTX *c)$/;"	f
+HASH_FINAL	md5_local.h	35;"	d
+HASH_LONG	md5_local.h	30;"	d
+HASH_MAKE_STRING	md5_local.h	36;"	d
+HASH_TRANSFORM	md32_common.h	/^void HASH_TRANSFORM (HASH_CTX *c, const unsigned char *data)$/;"	f
+HASH_TRANSFORM	md5_local.h	34;"	d
+HASH_UPDATE	md32_common.h	/^int HASH_UPDATE (HASH_CTX *c, const void *data_, size_t len)$/;"	f
+HASH_UPDATE	md5_local.h	33;"	d
+HOST_c2l	md32_common.h	211;"	d
+HOST_c2l	md32_common.h	222;"	d
+HOST_c2l	md32_common.h	227;"	d
+HOST_c2l	md32_common.h	246;"	d
+HOST_c2l	md32_common.h	258;"	d
+HOST_c2l	md32_common.h	264;"	d
+HOST_l2c	md32_common.h	214;"	d
+HOST_l2c	md32_common.h	223;"	d
+HOST_l2c	md32_common.h	234;"	d
+HOST_l2c	md32_common.h	249;"	d
+HOST_l2c	md32_common.h	259;"	d
+HOST_l2c	md32_common.h	271;"	d
+I	md5_local.h	60;"	d
+INIT_DATA_A	md5_dgst.c	18;"	d	file:
+INIT_DATA_B	md5_dgst.c	19;"	d	file:
+INIT_DATA_C	md5_dgst.c	20;"	d	file:
+INIT_DATA_D	md5_dgst.c	21;"	d	file:
+MAXFILENAME	parse_xml_for_software_download.c	45;"	d	file:
+MAXU32	ioapi.h	95;"	d
+MD32_REG_T	md32_common.h	389;"	d
+MD32_REG_T	md32_common.h	415;"	d
+MD5	md5_one.c	/^unsigned char *MD5(const unsigned char *d, size_t n, unsigned char *md)$/;"	f
+MD5_Init	md5_dgst.c	/^int MD5_Init(MD5_CTX *c)$/;"	f
+NOUNCRYPT	unzip.c	72;"	d	file:
+OF	ioapi.h	/^typedef ZPOS64_T (ZCALLBACK *tell64_file_func)    OF((voidpf opaque, voidpf stream));$/;"	t
+OF	ioapi.h	/^typedef uLong    (ZCALLBACK *read_file_func)      OF((voidpf opaque, voidpf stream, void* buf, uLong size));$/;"	t
+OF	ioapi.h	/^typedef uLong    (ZCALLBACK *write_file_func)     OF((voidpf opaque, voidpf stream, const void* buf, uLong size));$/;"	t
+OF	ioapi.h	/^typedef voidpf   (ZCALLBACK *open64_file_func)    OF((voidpf opaque, const void* filename, int mode));$/;"	t
+OF	ioapi.h	/^typedef voidpf   (ZCALLBACK *open_file_func)      OF((voidpf opaque, const char* filename, int mode));$/;"	t
+R0	md5_local.h	62;"	d
+R1	md5_local.h	67;"	d
+R2	md5_local.h	72;"	d
+R3	md5_local.h	77;"	d
+ROTATE	md32_common.h	143;"	d
+ROTATE	md32_common.h	146;"	d
+ROTATE	md32_common.h	148;"	d
+ROTATE	md32_common.h	151;"	d
+ROTATE	md32_common.h	154;"	d
+ROTATE	md32_common.h	156;"	d
+ROTATE	md32_common.h	166;"	d
+ROTATE	md32_common.h	176;"	d
+ROTATE	md32_common.h	184;"	d
+ROTATE	md32_common.h	195;"	d
+SIZECENTRALDIRITEM	unzip.c	118;"	d	file:
+SIZEZIPLOCALHEADER	unzip.c	119;"	d	file:
+STRCMPCASENOSENTIVEFUNCTION	unzip.c	378;"	d	file:
+TRYFREE	unzip.c	115;"	d	file:
+TagunzFile__	unzip.h	/^typedef struct TagunzFile__ { int unused; } unzFile__;$/;"	s
+UNZ_BADZIPFILE	unzip.h	79;"	d
+UNZ_BUFSIZE	unzip.c	104;"	d	file:
+UNZ_CRCERROR	unzip.h	81;"	d
+UNZ_END_OF_LIST_OF_FILE	unzip.h	75;"	d
+UNZ_EOF	unzip.h	77;"	d
+UNZ_ERRNO	unzip.h	76;"	d
+UNZ_INTERNALERROR	unzip.h	80;"	d
+UNZ_MAXFILENAMEINZIP	unzip.c	108;"	d	file:
+UNZ_OBJS	Makefile	/^UNZ_OBJS = parse_xml_for_software_download.o unzip.o ioapi.o md5.o  md5_one.o md5_dgst.o$/;"	m
+UNZ_OK	unzip.h	74;"	d
+UNZ_PARAMERROR	unzip.h	78;"	d
+WRITEBUFFERSIZE	parse_xml_for_software_download.c	47;"	d	file:
+X	md5_dgst.c	35;"	d	file:
+X	md5_dgst.c	45;"	d	file:
+ZCALLBACK	ioapi.h	126;"	d
+ZCALLBACK	ioapi.h	128;"	d
+ZCLOSE64	ioapi.h	191;"	d
+ZERROR64	ioapi.h	192;"	d
+ZIP_OBJS	Makefile	/^ZIP_OBJS = app.o zip.o   ioapi.o$/;"	m
+ZLIB	Makefile	/^ZLIB=-L..\/.. -lz $/;"	m
+ZLIB_FILEFUNC_MODE_CREATE	ioapi.h	121;"	d
+ZLIB_FILEFUNC_MODE_EXISTING	ioapi.h	120;"	d
+ZLIB_FILEFUNC_MODE_READ	ioapi.h	116;"	d
+ZLIB_FILEFUNC_MODE_READWRITEFILTER	ioapi.h	118;"	d
+ZLIB_FILEFUNC_MODE_WRITE	ioapi.h	117;"	d
+ZLIB_FILEFUNC_SEEK_CUR	ioapi.h	112;"	d
+ZLIB_FILEFUNC_SEEK_END	ioapi.h	113;"	d
+ZLIB_FILEFUNC_SEEK_SET	ioapi.h	114;"	d
+ZOPEN64	ioapi.h	200;"	d
+ZPOS64_T	ioapi.h	/^typedef  64BIT_INT_CUSTOM_TYPE ZPOS64_T;$/;"	t
+ZPOS64_T	ioapi.h	/^typedef uint64_t ZPOS64_T;$/;"	t
+ZPOS64_T	ioapi.h	/^typedef unsigned __int64 ZPOS64_T;$/;"	t
+ZPOS64_T	ioapi.h	/^typedef unsigned long long int ZPOS64_T;$/;"	t
+ZREAD64	ioapi.h	187;"	d
+ZSEEK64	ioapi.h	202;"	d
+ZTELL64	ioapi.h	201;"	d
+ZWRITE64	ioapi.h	188;"	d
+Z_BZIP2ED	unzip.h	62;"	d
+_CRT_SECURE_NO_WARNINGS	ioapi.c	14;"	d	file:
+_FILE_OFFSET_BIT	ioapi.h	39;"	d
+_FILE_OFFSET_BIT	parse_xml_for_software_download.c	12;"	d	file:
+_LARGEFILE64_SOURCE	ioapi.h	36;"	d
+_LARGEFILE64_SOURCE	parse_xml_for_software_download.c	9;"	d	file:
+_ZLIBIOAPI64_H	ioapi.h	22;"	d
+__USE_FILE_OFFSET64	ioapi.h	30;"	d
+__USE_FILE_OFFSET64	parse_xml_for_software_download.c	3;"	d	file:
+__USE_LARGEFILE64	ioapi.h	33;"	d
+__USE_LARGEFILE64	parse_xml_for_software_download.c	6;"	d	file:
+_unz64_H	unzip.h	44;"	d
+bstream	unzip.c	/^    bz_stream bstream;          \/* bzLib stream structure for bziped *\/$/;"	m	struct:__anon1	file:
+byte_before_the_zipfile	unzip.c	/^    ZPOS64_T byte_before_the_zipfile;\/* byte before the zipfile, (>0 for sfx)*\/$/;"	m	struct:__anon1	file:
+byte_before_the_zipfile	unzip.c	/^    ZPOS64_T byte_before_the_zipfile;\/* byte before the zipfile, (>0 for sfx)*\/$/;"	m	struct:__anon2	file:
+call_zopen64	ioapi.c	/^voidpf call_zopen64 (const zlib_filefunc64_32_def* pfilefunc,const void*filename,int mode)$/;"	f
+call_zseek64	ioapi.c	/^long call_zseek64 (const zlib_filefunc64_32_def* pfilefunc,voidpf filestream, ZPOS64_T offset, int origin)$/;"	f
+call_ztell64	ioapi.c	/^ZPOS64_T call_ztell64 (const zlib_filefunc64_32_def* pfilefunc,voidpf filestream)$/;"	f
+central_pos	unzip.c	/^    ZPOS64_T central_pos;          \/* position of the beginning of the central dir*\/$/;"	m	struct:__anon2	file:
+change_file_date	parse_xml_for_software_download.c	/^void change_file_date(filename,dosdate,tmu_date)$/;"	f
+close_file_func	ioapi.h	/^typedef int      (ZCALLBACK *close_file_func)     OF((voidpf opaque, voidpf stream));$/;"	t
+compressed_size	unzip.h	/^    ZPOS64_T compressed_size;   \/* compressed size                 8 bytes *\/$/;"	m	struct:unz_file_info64_s
+compressed_size	unzip.h	/^    uLong compressed_size;      \/* compressed size                 4 bytes *\/$/;"	m	struct:unz_file_info_s
+compression_method	unzip.c	/^    uLong compression_method;   \/* compression method (0==store) *\/$/;"	m	struct:__anon1	file:
+compression_method	unzip.h	/^    uLong compression_method;   \/* compression method              2 bytes *\/$/;"	m	struct:unz_file_info64_s
+compression_method	unzip.h	/^    uLong compression_method;   \/* compression method              2 bytes *\/$/;"	m	struct:unz_file_info_s
+crc	unzip.h	/^    uLong crc;                  \/* crc-32                          4 bytes *\/$/;"	m	struct:unz_file_info64_s
+crc	unzip.h	/^    uLong crc;                  \/* crc-32                          4 bytes *\/$/;"	m	struct:unz_file_info_s
+crc32	unzip.c	/^    uLong crc32;                \/* crc32 of all data uncompressed *\/$/;"	m	struct:__anon1	file:
+crc32_wait	unzip.c	/^    uLong crc32_wait;           \/* crc32 we must obtain after decompress all *\/$/;"	m	struct:__anon1	file:
+cur_file_info	unzip.c	/^    unz_file_info64 cur_file_info; \/* public info about the current file in zip*\/$/;"	m	struct:__anon2	file:
+cur_file_info_internal	unzip.c	/^    unz_file_info64_internal cur_file_info_internal; \/* private info about it*\/$/;"	m	struct:__anon2	file:
+current_file_ok	unzip.c	/^    ZPOS64_T current_file_ok;      \/* flag about the usability of the current file*\/$/;"	m	struct:__anon2	file:
+disk_num_start	unzip.h	/^    uLong disk_num_start;       \/* disk number start               2 bytes *\/$/;"	m	struct:unz_file_info64_s
+disk_num_start	unzip.h	/^    uLong disk_num_start;       \/* disk number start               2 bytes *\/$/;"	m	struct:unz_file_info_s
+do_extract	parse_xml_for_software_download.c	/^int do_extract(uf,opt_extract_without_path,opt_overwrite,password)$/;"	f
+do_extract_currentfile	parse_xml_for_software_download.c	/^int do_extract_currentfile(uf,popt_extract_without_path,popt_overwrite,password)$/;"	f
+dosDate	unzip.h	/^    uLong dosDate;              \/* last mod file date in Dos fmt   4 bytes *\/$/;"	m	struct:unz_file_info64_s
+dosDate	unzip.h	/^    uLong dosDate;              \/* last mod file date in Dos fmt   4 bytes *\/$/;"	m	struct:unz_file_info_s
+encrypted	unzip.c	/^    int encrypted;$/;"	m	struct:__anon2	file:
+external_fa	unzip.h	/^    uLong external_fa;          \/* external file attributes        4 bytes *\/$/;"	m	struct:unz_file_info64_s
+external_fa	unzip.h	/^    uLong external_fa;          \/* external file attributes        4 bytes *\/$/;"	m	struct:unz_file_info_s
+fclose_file_func	ioapi.c	/^static int ZCALLBACK fclose_file_func (voidpf opaque, voidpf stream)$/;"	f	file:
+ferror_file_func	ioapi.c	/^static int ZCALLBACK ferror_file_func (voidpf opaque, voidpf stream)$/;"	f	file:
+file_in_zip64_read_info_s	unzip.c	/^} file_in_zip64_read_info_s;$/;"	t	typeref:struct:__anon1	file:
+filename_to_extract	parse_xml_for_software_download.c	/^const char *filename_to_extract=NULL;$/;"	v
+filestream	unzip.c	/^    voidpf filestream;        \/* io structore of the zipfile *\/$/;"	m	struct:__anon1	file:
+filestream	unzip.c	/^    voidpf filestream;        \/* io structore of the zipfile *\/$/;"	m	struct:__anon2	file:
+fill_fopen64_filefunc	ioapi.c	/^void fill_fopen64_filefunc (zlib_filefunc64_def*  pzlib_filefunc_def)$/;"	f
+fill_fopen_filefunc	ioapi.c	/^void fill_fopen_filefunc (pzlib_filefunc_def)$/;"	f
+fill_zlib_filefunc64_32_def_from_filefunc32	ioapi.c	/^void fill_zlib_filefunc64_32_def_from_filefunc32(zlib_filefunc64_32_def* p_filefunc64_32,const zlib_filefunc_def* p_filefunc32)$/;"	f
+flag	unzip.h	/^    uLong flag;                 \/* general purpose bit flag        2 bytes *\/$/;"	m	struct:unz_file_info64_s
+flag	unzip.h	/^    uLong flag;                 \/* general purpose bit flag        2 bytes *\/$/;"	m	struct:unz_file_info_s
+fopen64	ioapi.h	49;"	d
+fopen64	ioapi.h	54;"	d
+fopen64	ioapi.h	59;"	d
+fopen64_file_func	ioapi.c	/^static voidpf ZCALLBACK fopen64_file_func (voidpf opaque, const void* filename, int mode)$/;"	f	file:
+fopen_file_func	ioapi.c	/^static voidpf ZCALLBACK fopen_file_func (voidpf opaque, const char* filename, int mode)$/;"	f	file:
+fread_file_func	ioapi.c	/^static uLong ZCALLBACK fread_file_func (voidpf opaque, voidpf stream, void* buf, uLong size)$/;"	f	file:
+fseek64_file_func	ioapi.c	/^static long ZCALLBACK fseek64_file_func (voidpf  opaque, voidpf stream, ZPOS64_T offset, int origin)$/;"	f	file:
+fseek_file_func	ioapi.c	/^static long ZCALLBACK fseek_file_func (voidpf  opaque, voidpf stream, uLong offset, int origin)$/;"	f	file:
+fseeko64	ioapi.h	51;"	d
+fseeko64	ioapi.h	56;"	d
+fseeko64	ioapi.h	62;"	d
+fseeko64	ioapi.h	65;"	d
+ftell64_file_func	ioapi.c	/^static ZPOS64_T ZCALLBACK ftell64_file_func (voidpf opaque, voidpf stream)$/;"	f	file:
+ftell_file_func	ioapi.c	/^static long ZCALLBACK ftell_file_func (voidpf opaque, voidpf stream)$/;"	f	file:
+ftello64	ioapi.h	50;"	d
+ftello64	ioapi.h	55;"	d
+ftello64	ioapi.h	61;"	d
+ftello64	ioapi.h	64;"	d
+fwrite_file_func	ioapi.c	/^static uLong ZCALLBACK fwrite_file_func (voidpf opaque, voidpf stream, const void* buf, uLong size)$/;"	f	file:
+get_size_by_fd	md5.c	/^unsigned long get_size_by_fd(int fd) {$/;"	f
+gi	unzip.c	/^    unz_global_info64 gi;       \/* public global information *\/$/;"	m	struct:__anon2	file:
+internal_fa	unzip.h	/^    uLong internal_fa;          \/* internal file attributes        2 bytes *\/$/;"	m	struct:unz_file_info64_s
+internal_fa	unzip.h	/^    uLong internal_fa;          \/* internal file attributes        2 bytes *\/$/;"	m	struct:unz_file_info_s
+is64bitOpenFunction	unzip.c	/^    int is64bitOpenFunction;$/;"	m	struct:__anon2	file:
+isZip64	unzip.c	/^    int isZip64;$/;"	m	struct:__anon2	file:
+keys	unzip.c	/^    unsigned long keys[3];     \/* keys defining the pseudo-random sequence *\/$/;"	m	struct:__anon2	file:
+local	unzip.c	91;"	d	file:
+main	parse_xml_for_software_download.c	/^int main(int argc,char *argv[])$/;"	f
+makedir	parse_xml_for_software_download.c	/^int makedir (newdir)$/;"	f
+md5_block_data_order	md5_dgst.c	/^void md5_block_data_order(MD5_CTX *c, const void *data_, size_t num)$/;"	f
+md5_block_data_order	md5_local.h	18;"	d
+md5_block_data_order	md5_local.h	20;"	d
+md5_block_data_order	md5_local.h	22;"	d
+md5_for_file	md5.c	/^unsigned char *md5_for_file(char *filename) {$/;"	f
+md5_is_match	md5.c	/^int md5_is_match(unsigned char *md5_1, unsigned char *md5_2) {$/;"	f
+md5_is_match_str	md5.c	/^int md5_is_match_str(unsigned char *md5, char *md5_str) {$/;"	f
+md5sum_fun	parse_xml_for_software_download.c	/^char* md5sum_fun(char *filename)$/;"	f
+mymkdir	parse_xml_for_software_download.c	/^int mymkdir(dirname)$/;"	f
+num_file	unzip.c	/^    ZPOS64_T num_file;             \/* number of the current file in the zipfile*\/$/;"	m	struct:__anon2	file:
+num_of_file	unzip.h	/^    ZPOS64_T num_of_file;            \/* # of file *\/$/;"	m	struct:unz64_file_pos_s
+num_of_file	unzip.h	/^    uLong num_of_file;            \/* # of file *\/$/;"	m	struct:unz_file_pos_s
+number_entry	unzip.h	/^    ZPOS64_T number_entry;         \/* total number of entries in$/;"	m	struct:unz_global_info64_s
+number_entry	unzip.h	/^    uLong number_entry;         \/* total number of entries in$/;"	m	struct:unz_global_info_s
+offset_central_dir	unzip.c	/^    ZPOS64_T offset_central_dir;   \/* offset of start of central directory with$/;"	m	struct:__anon2	file:
+offset_curfile	unzip.c	/^    ZPOS64_T offset_curfile;\/* relative offset of local header 8 bytes *\/$/;"	m	struct:unz_file_info64_internal_s	file:
+offset_local_extrafield	unzip.c	/^    ZPOS64_T offset_local_extrafield;\/* offset of the local extra field *\/$/;"	m	struct:__anon1	file:
+opaque	ioapi.h	/^    voidpf              opaque;$/;"	m	struct:zlib_filefunc64_def_s
+opaque	ioapi.h	/^    voidpf              opaque;$/;"	m	struct:zlib_filefunc_def_s
+pcrc_32_tab	unzip.c	/^    const z_crc_t* pcrc_32_tab;$/;"	m	struct:__anon2	file:
+pfile_in_zip_read	unzip.c	/^    file_in_zip64_read_info_s* pfile_in_zip_read; \/* structure about the current$/;"	m	struct:__anon2	file:
+pos_in_central_dir	unzip.c	/^    ZPOS64_T pos_in_central_dir;   \/* pos of the current file in the central dir*\/$/;"	m	struct:__anon2	file:
+pos_in_zip_directory	unzip.h	/^    ZPOS64_T pos_in_zip_directory;   \/* offset in zip file directory *\/$/;"	m	struct:unz64_file_pos_s
+pos_in_zip_directory	unzip.h	/^    uLong pos_in_zip_directory;   \/* offset in zip file directory *\/$/;"	m	struct:unz_file_pos_s
+pos_in_zipfile	unzip.c	/^    ZPOS64_T pos_in_zipfile;       \/* position in byte on the zipfile, for fseek*\/$/;"	m	struct:__anon1	file:
+pos_local_extrafield	unzip.c	/^    ZPOS64_T pos_local_extrafield;   \/* position in the local extra field in read*\/$/;"	m	struct:__anon1	file:
+print_md5_sum	md5.c	/^void print_md5_sum(unsigned char *md) {$/;"	f
+raw	unzip.c	/^    int   raw;$/;"	m	struct:__anon1	file:
+read_buffer	unzip.c	/^    char  *read_buffer;         \/* internal buffer for compressed data *\/$/;"	m	struct:__anon1	file:
+rest_read_compressed	unzip.c	/^    ZPOS64_T rest_read_compressed; \/* number of byte to be decompressed *\/$/;"	m	struct:__anon1	file:
+rest_read_uncompressed	unzip.c	/^    ZPOS64_T rest_read_uncompressed;\/*number of byte to be obtained after decomp*\/$/;"	m	struct:__anon1	file:
+seek64_file_func	ioapi.h	/^typedef long     (ZCALLBACK *seek64_file_func)    OF((voidpf opaque, voidpf stream, ZPOS64_T offset, int origin));$/;"	t
+seek_file_func	ioapi.h	/^typedef long     (ZCALLBACK *seek_file_func)      OF((voidpf opaque, voidpf stream, uLong offset, int origin));$/;"	t
+size_central_dir	unzip.c	/^    ZPOS64_T size_central_dir;     \/* size of the central directory  *\/$/;"	m	struct:__anon2	file:
+size_comment	unzip.h	/^    uLong size_comment;         \/* size of the global comment of the zipfile *\/$/;"	m	struct:unz_global_info64_s
+size_comment	unzip.h	/^    uLong size_comment;         \/* size of the global comment of the zipfile *\/$/;"	m	struct:unz_global_info_s
+size_file_comment	unzip.h	/^    uLong size_file_comment;    \/* file comment length             2 bytes *\/$/;"	m	struct:unz_file_info64_s
+size_file_comment	unzip.h	/^    uLong size_file_comment;    \/* file comment length             2 bytes *\/$/;"	m	struct:unz_file_info_s
+size_file_extra	unzip.h	/^    uLong size_file_extra;      \/* extra field length              2 bytes *\/$/;"	m	struct:unz_file_info64_s
+size_file_extra	unzip.h	/^    uLong size_file_extra;      \/* extra field length              2 bytes *\/$/;"	m	struct:unz_file_info_s
+size_filename	unzip.h	/^    uLong size_filename;        \/* filename length                 2 bytes *\/$/;"	m	struct:unz_file_info64_s
+size_filename	unzip.h	/^    uLong size_filename;        \/* filename length                 2 bytes *\/$/;"	m	struct:unz_file_info_s
+size_local_extrafield	unzip.c	/^    uInt  size_local_extrafield;\/* size of the local extra field *\/$/;"	m	struct:__anon1	file:
+strcmpcasenosensitive_internal	unzip.c	/^local int strcmpcasenosensitive_internal (const char* fileName1, const char* fileName2)$/;"	f
+stream	unzip.c	/^    z_stream stream;            \/* zLib stream structure for inflate *\/$/;"	m	struct:__anon1	file:
+stream_initialised	unzip.c	/^    uLong stream_initialised;   \/* flag set if stream structure is initialised*\/$/;"	m	struct:__anon1	file:
+tell_file_func	ioapi.h	/^typedef long     (ZCALLBACK *tell_file_func)      OF((voidpf opaque, voidpf stream));$/;"	t
+testerror_file_func	ioapi.h	/^typedef int      (ZCALLBACK *testerror_file_func) OF((voidpf opaque, voidpf stream));$/;"	t
+tm_hour	unzip.h	/^    uInt tm_hour;           \/* hours since midnight - [0,23] *\/$/;"	m	struct:tm_unz_s
+tm_mday	unzip.h	/^    uInt tm_mday;           \/* day of the month - [1,31] *\/$/;"	m	struct:tm_unz_s
+tm_min	unzip.h	/^    uInt tm_min;            \/* minutes after the hour - [0,59] *\/$/;"	m	struct:tm_unz_s
+tm_mon	unzip.h	/^    uInt tm_mon;            \/* months since January - [0,11] *\/$/;"	m	struct:tm_unz_s
+tm_sec	unzip.h	/^    uInt tm_sec;            \/* seconds after the minute - [0,59] *\/$/;"	m	struct:tm_unz_s
+tm_unz	unzip.h	/^} tm_unz;$/;"	t	typeref:struct:tm_unz_s
+tm_unz_s	unzip.h	/^typedef struct tm_unz_s$/;"	s
+tm_year	unzip.h	/^    uInt tm_year;           \/* years - [1980..2044] *\/$/;"	m	struct:tm_unz_s
+tmu_date	unzip.h	/^    tm_unz tmu_date;$/;"	m	struct:unz_file_info64_s
+tmu_date	unzip.h	/^    tm_unz tmu_date;$/;"	m	struct:unz_file_info_s
+total_out_64	unzip.c	/^    ZPOS64_T total_out_64;$/;"	m	struct:__anon1	file:
+uncompressed_size	unzip.h	/^    ZPOS64_T uncompressed_size; \/* uncompressed size               8 bytes *\/$/;"	m	struct:unz_file_info64_s
+uncompressed_size	unzip.h	/^    uLong uncompressed_size;    \/* uncompressed size               4 bytes *\/$/;"	m	struct:unz_file_info_s
+unused	unzip.h	/^typedef struct TagunzFile__ { int unused; } unzFile__;$/;"	m	struct:TagunzFile__
+unz64_file_pos	unzip.h	/^} unz64_file_pos;$/;"	t	typeref:struct:unz64_file_pos_s
+unz64_file_pos_s	unzip.h	/^typedef struct unz64_file_pos_s$/;"	s
+unz64_s	unzip.c	/^} unz64_s;$/;"	t	typeref:struct:__anon2	file:
+unz64local_CheckCurrentFileCoherencyHeader	unzip.c	/^local int unz64local_CheckCurrentFileCoherencyHeader (unz64_s* s, uInt* piSizeVar,$/;"	f
+unz64local_DosDateToTmuDate	unzip.c	/^local void unz64local_DosDateToTmuDate (ZPOS64_T ulDosDate, tm_unz* ptm)$/;"	f
+unz64local_GetCurrentFileInfoInternal	unzip.c	/^local int unz64local_GetCurrentFileInfoInternal (unzFile file,$/;"	f
+unz64local_SearchCentralDir	unzip.c	/^local ZPOS64_T unz64local_SearchCentralDir(const zlib_filefunc64_32_def* pzlib_filefunc_def, voidpf filestream)$/;"	f
+unz64local_SearchCentralDir64	unzip.c	/^local ZPOS64_T unz64local_SearchCentralDir64(const zlib_filefunc64_32_def* pzlib_filefunc_def,$/;"	f
+unz64local_getByte	unzip.c	/^local int unz64local_getByte(const zlib_filefunc64_32_def* pzlib_filefunc_def, voidpf filestream, int *pi)$/;"	f
+unz64local_getLong	unzip.c	/^local int unz64local_getLong (const zlib_filefunc64_32_def* pzlib_filefunc_def,$/;"	f
+unz64local_getLong64	unzip.c	/^local int unz64local_getLong64 (const zlib_filefunc64_32_def* pzlib_filefunc_def,$/;"	f
+unz64local_getShort	unzip.c	/^local int unz64local_getShort (const zlib_filefunc64_32_def* pzlib_filefunc_def,$/;"	f
+unzClose	unzip.c	/^extern int ZEXPORT unzClose (unzFile file)$/;"	f
+unzCloseCurrentFile	unzip.c	/^extern int ZEXPORT unzCloseCurrentFile (unzFile file)$/;"	f
+unzFile	unzip.h	/^typedef unzFile__ *unzFile;$/;"	t
+unzFile	unzip.h	/^typedef voidp unzFile;$/;"	t
+unzFile__	unzip.h	/^typedef struct TagunzFile__ { int unused; } unzFile__;$/;"	t	typeref:struct:TagunzFile__
+unzGetCurrentFileInfo	unzip.c	/^extern int ZEXPORT unzGetCurrentFileInfo (unzFile file,$/;"	f
+unzGetCurrentFileInfo64	unzip.c	/^extern int ZEXPORT unzGetCurrentFileInfo64 (unzFile file,$/;"	f
+unzGetCurrentFileZStreamPos64	unzip.c	/^extern ZPOS64_T ZEXPORT unzGetCurrentFileZStreamPos64( unzFile file)$/;"	f
+unzGetFilePos	unzip.c	/^extern int ZEXPORT unzGetFilePos($/;"	f
+unzGetFilePos64	unzip.c	/^extern int ZEXPORT unzGetFilePos64(unzFile file, unz64_file_pos*  file_pos)$/;"	f
+unzGetGlobalComment	unzip.c	/^extern int ZEXPORT unzGetGlobalComment (unzFile file, char * szComment, uLong uSizeBuf)$/;"	f
+unzGetGlobalInfo	unzip.c	/^extern int ZEXPORT unzGetGlobalInfo (unzFile file, unz_global_info* pglobal_info32)$/;"	f
+unzGetGlobalInfo64	unzip.c	/^extern int ZEXPORT unzGetGlobalInfo64 (unzFile file, unz_global_info64* pglobal_info)$/;"	f
+unzGetLocalExtrafield	unzip.c	/^extern int ZEXPORT unzGetLocalExtrafield (unzFile file, voidp buf, unsigned len)$/;"	f
+unzGetOffset	unzip.c	/^extern uLong ZEXPORT unzGetOffset (unzFile file)$/;"	f
+unzGetOffset64	unzip.c	/^extern ZPOS64_T ZEXPORT unzGetOffset64(unzFile file)$/;"	f
+unzGoToFilePos	unzip.c	/^extern int ZEXPORT unzGoToFilePos($/;"	f
+unzGoToFilePos64	unzip.c	/^extern int ZEXPORT unzGoToFilePos64(unzFile file, const unz64_file_pos* file_pos)$/;"	f
+unzGoToFirstFile	unzip.c	/^extern int ZEXPORT unzGoToFirstFile (unzFile file)$/;"	f
+unzGoToNextFile	unzip.c	/^extern int ZEXPORT unzGoToNextFile (unzFile  file)$/;"	f
+unzLocateFile	unzip.c	/^extern int ZEXPORT unzLocateFile (unzFile file, const char *szFileName, int iCaseSensitivity)$/;"	f
+unzOpen	unzip.c	/^extern unzFile ZEXPORT unzOpen (const char *path)$/;"	f
+unzOpen2	unzip.c	/^extern unzFile ZEXPORT unzOpen2 (const char *path,$/;"	f
+unzOpen2_64	unzip.c	/^extern unzFile ZEXPORT unzOpen2_64 (const void *path,$/;"	f
+unzOpen64	unzip.c	/^extern unzFile ZEXPORT unzOpen64 (const void *path)$/;"	f
+unzOpenCurrentFile	unzip.c	/^extern int ZEXPORT unzOpenCurrentFile (unzFile file)$/;"	f
+unzOpenCurrentFile2	unzip.c	/^extern int ZEXPORT unzOpenCurrentFile2 (unzFile file, int* method, int* level, int raw)$/;"	f
+unzOpenCurrentFile3	unzip.c	/^extern int ZEXPORT unzOpenCurrentFile3 (unzFile file, int* method,$/;"	f
+unzOpenCurrentFilePassword	unzip.c	/^extern int ZEXPORT unzOpenCurrentFilePassword (unzFile file, const char*  password)$/;"	f
+unzOpenInternal	unzip.c	/^local unzFile unzOpenInternal (const void *path,$/;"	f
+unzReadCurrentFile	unzip.c	/^extern int ZEXPORT unzReadCurrentFile  (unzFile file, voidp buf, unsigned len)$/;"	f
+unzSetOffset	unzip.c	/^extern int ZEXPORT unzSetOffset (unzFile file, uLong pos)$/;"	f
+unzSetOffset64	unzip.c	/^extern int ZEXPORT unzSetOffset64(unzFile file, ZPOS64_T pos)$/;"	f
+unzStringFileNameCompare	unzip.c	/^extern int ZEXPORT unzStringFileNameCompare (const char*  fileName1,$/;"	f
+unz_copyright	unzip.c	/^const char unz_copyright[] =$/;"	v
+unz_file_info	unzip.h	/^} unz_file_info;$/;"	t	typeref:struct:unz_file_info_s
+unz_file_info64	unzip.h	/^} unz_file_info64;$/;"	t	typeref:struct:unz_file_info64_s
+unz_file_info64_internal	unzip.c	/^} unz_file_info64_internal;$/;"	t	typeref:struct:unz_file_info64_internal_s	file:
+unz_file_info64_internal_s	unzip.c	/^typedef struct unz_file_info64_internal_s$/;"	s	file:
+unz_file_info64_s	unzip.h	/^typedef struct unz_file_info64_s$/;"	s
+unz_file_info_s	unzip.h	/^typedef struct unz_file_info_s$/;"	s
+unz_file_pos	unzip.h	/^} unz_file_pos;$/;"	t	typeref:struct:unz_file_pos_s
+unz_file_pos_s	unzip.h	/^typedef struct unz_file_pos_s$/;"	s
+unz_global_info	unzip.h	/^} unz_global_info;$/;"	t	typeref:struct:unz_global_info_s
+unz_global_info64	unzip.h	/^} unz_global_info64;$/;"	t	typeref:struct:unz_global_info64_s
+unz_global_info64_s	unzip.h	/^typedef struct unz_global_info64_s$/;"	s
+unz_global_info_s	unzip.h	/^typedef struct unz_global_info_s$/;"	s
+unzeof	unzip.c	/^extern int ZEXPORT unzeof (unzFile file)$/;"	f
+unzip	parse_xml_for_software_download.c	/^int unzip(char *filename,char*dest)$/;"	f
+unztell	unzip.c	/^extern z_off_t ZEXPORT unztell (unzFile file)$/;"	f
+unztell64	unzip.c	/^extern ZPOS64_T ZEXPORT unztell64 (unzFile file)$/;"	f
+version	unzip.h	/^    uLong version;              \/* version made by                 2 bytes *\/$/;"	m	struct:unz_file_info64_s
+version	unzip.h	/^    uLong version;              \/* version made by                 2 bytes *\/$/;"	m	struct:unz_file_info_s
+version_needed	unzip.h	/^    uLong version_needed;       \/* version needed to extract       2 bytes *\/$/;"	m	struct:unz_file_info64_s
+version_needed	unzip.h	/^    uLong version_needed;       \/* version needed to extract       2 bytes *\/$/;"	m	struct:unz_file_info_s
+z_filefunc	unzip.c	/^    zlib_filefunc64_32_def z_filefunc;$/;"	m	struct:__anon1	file:
+z_filefunc	unzip.c	/^    zlib_filefunc64_32_def z_filefunc;$/;"	m	struct:__anon2	file:
+zclose_file	ioapi.h	/^    close_file_func     zclose_file;$/;"	m	struct:zlib_filefunc64_def_s
+zclose_file	ioapi.h	/^    close_file_func     zclose_file;$/;"	m	struct:zlib_filefunc_def_s
+zerror_file	ioapi.h	/^    testerror_file_func zerror_file;$/;"	m	struct:zlib_filefunc64_def_s
+zerror_file	ioapi.h	/^    testerror_file_func zerror_file;$/;"	m	struct:zlib_filefunc_def_s
+zfile_func64	ioapi.h	/^    zlib_filefunc64_def zfile_func64;$/;"	m	struct:zlib_filefunc64_32_def_s
+zlib_filefunc64_32_def	ioapi.h	/^} zlib_filefunc64_32_def;$/;"	t	typeref:struct:zlib_filefunc64_32_def_s
+zlib_filefunc64_32_def_s	ioapi.h	/^typedef struct zlib_filefunc64_32_def_s$/;"	s
+zlib_filefunc64_def	ioapi.h	/^} zlib_filefunc64_def;$/;"	t	typeref:struct:zlib_filefunc64_def_s
+zlib_filefunc64_def_s	ioapi.h	/^typedef struct zlib_filefunc64_def_s$/;"	s
+zlib_filefunc_def	ioapi.h	/^} zlib_filefunc_def;$/;"	t	typeref:struct:zlib_filefunc_def_s
+zlib_filefunc_def_s	ioapi.h	/^typedef struct zlib_filefunc_def_s$/;"	s
+zopen32_file	ioapi.h	/^    open_file_func      zopen32_file;$/;"	m	struct:zlib_filefunc64_32_def_s
+zopen64_file	ioapi.h	/^    open64_file_func    zopen64_file;$/;"	m	struct:zlib_filefunc64_def_s
+zopen_file	ioapi.h	/^    open_file_func      zopen_file;$/;"	m	struct:zlib_filefunc_def_s
+zread_file	ioapi.h	/^    read_file_func      zread_file;$/;"	m	struct:zlib_filefunc64_def_s
+zread_file	ioapi.h	/^    read_file_func      zread_file;$/;"	m	struct:zlib_filefunc_def_s
+zseek32_file	ioapi.h	/^    seek_file_func      zseek32_file;$/;"	m	struct:zlib_filefunc64_32_def_s
+zseek64_file	ioapi.h	/^    seek64_file_func    zseek64_file;$/;"	m	struct:zlib_filefunc64_def_s
+zseek_file	ioapi.h	/^    seek_file_func      zseek_file;$/;"	m	struct:zlib_filefunc_def_s
+ztell32_file	ioapi.h	/^    tell_file_func      ztell32_file;$/;"	m	struct:zlib_filefunc64_32_def_s
+ztell64_file	ioapi.h	/^    tell64_file_func    ztell64_file;$/;"	m	struct:zlib_filefunc64_def_s
+ztell_file	ioapi.h	/^    tell_file_func      ztell_file;$/;"	m	struct:zlib_filefunc_def_s
+zwrite_file	ioapi.h	/^    write_file_func     zwrite_file;$/;"	m	struct:zlib_filefunc64_def_s
+zwrite_file	ioapi.h	/^    write_file_func     zwrite_file;$/;"	m	struct:zlib_filefunc_def_s

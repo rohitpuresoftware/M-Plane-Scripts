@@ -43,6 +43,9 @@ fi
 	mkdir -p $INSTALLER_DIR/sysrepo && echo "creating $INSTALLER_DIR/sysrepo directory"
 	fi
 
+	if [ ! -d "$INSTALLER_DIR/software_management" ] ;then
+	mkdir -p $INSTALLER_DIR/sysrepo && echo "creating $INSTALLER_DIR/software_management directory"
+	fi
 
 #apt-get update && apt-get install -y openssl libssl-dev vim python3-pip libpcre2-8-0 libpcre2-dev
 
@@ -171,18 +174,22 @@ echo "configuring foxconn-operations"
 sysrepocfg --edit=$CONFIG_DATA_DIR/foxconn-oper-rw.xml -m foxconn-operations --datastore startup
 fi
 
-SCTL_MODULE=`echo "$SCTL_MODULES" | grep "ietf-netconf-server"`
+SCTL_MODULE=`echo "$SCTL_MODULES" | grep "ietf-hardware"`
 if [ ! -z "$SCTL_MODULE" ];then
-echo "configuring ietf-netconf-server"
-sysrepocfg --edit=$CONFIG_DATA_DIR/ssh_callhome.xml -m ietf-netconf-server --datastore startup
+echo "configuring ietf-hardware"
+sysrepocfg --edit=$CONFIG_DATA_DIR/ietf_hw.xml -m ietf-hardware --datastore startup
 fi
 echo "copying startup data to running data"
-sysrepocfg -C startup
-
-echo "Installation has been done "
 
 if [ "x$1" == "x--server" ]; then
+##=========>configuration for call home<=================
 
+SCTL_MODULE=`echo "$SCTL_MODULES" | grep "ietf-netconf-server"`
+if [ ! -z "$SCTL_MODULE" ];then
+echo "configuring ietf-netconf-server for call-home"
+sysrepocfg --edit=$CONFIG_DATA_DIR/ssh_callhome.xml -m ietf-netconf-server --datastore startup
+fi
+#=========>copying netopeer2-server <===============
 cp -rf $PWD/usr/local/bin/netopeer2-server $INSTALLER_BIN
 
 elif [ "x$1" == "x--client" ];then
@@ -199,3 +206,5 @@ echo "To run as server please execute: ./install.sh --server"
 echo "To run as client please execute: ./install.sh --client"
 exit 0
 fi
+sysrepocfg -C startup
+echo "Installation has been done "

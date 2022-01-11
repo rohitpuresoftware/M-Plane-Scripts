@@ -1,0 +1,8 @@
+<hardware xmlns="urn:ietf:params:xml:ns:yang:ietf-hardware" >
+    <component>
+      <name>PS</name>
+       <class xmlns:o-ran-hw="urn:o-ran:hardware:1.0">o-ran-hw:O-RAN-RADIO</class>
+      <o-ran-name xmlns="urn:o-ran:hardware:1.0">PS</o-ran-name>
+    </component>
+  </hardware>
+

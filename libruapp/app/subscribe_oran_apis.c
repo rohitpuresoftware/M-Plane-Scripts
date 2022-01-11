@@ -454,10 +454,21 @@ mplane_oran_software_install(sr_session_ctx_t *session,
 	ru_sw_pkg_out_t *out = NULL;
 	wrap_sr_val_t wrap_sr_val = {0};
 
+	printf("software install RPC hit\n");
 	// More values can be filled and passed
 	in.type = SW_INSTALL;
 	in.sw_install_in.slot_name = input->data.string_val;
+	in.session=session;
 
+	int i=0;
+	while(i<input_cnt-1)
+	{
+
+	in.sw_install_in.file_names[i]=strdup(input[i+1].data.string_val);
+//	printf("file names %s\n",in.sw_install_in.file_names[i]);
+	i++;
+	}
+	in.sw_install_in.file_names[i]=NULL;
 	rc=ps5g_mplane_software_install(&in, &out);
 
 	if(rc != SR_ERR_OK)
@@ -477,11 +488,13 @@ mplane_oran_software_install(sr_session_ctx_t *session,
 				SR_STRING_T,
 				0,
 				out->sw_install_out.error_message,
-				strdup("unknown"));
+				strdup(out->sw_install_out.error_message));
 	}
 
 	*output_cnt = wrap_sr_val.count;
 	*output = wrap_sr_val.values;
+	free(in.sw_install_in.file_names[0]);
+	free(out);
 
 	return SR_ERR_OK;
 
@@ -1203,6 +1216,17 @@ int start_software_download_thread()
 	if(rc!=SR_ERR_OK)
 		goto error;
 error:
+	return rc;
+
+}
+int start_software_install_thread()
+{
+	printf("software install thread started\n");
+	pthread_t sw_install_thread;
+	int rc=pthread_create(&sw_install_thread,NULL,software_install_thread,NULL);
+	if(rc!=SR_ERR_OK)
+		goto error;
+error:
 	return rc;		
 }
 
@@ -1366,6 +1390,11 @@ o_ran_lib_sub()
 	if(rc != SR_ERR_OK)
 	{
 		printf("software_download_thread_fail\n");
+	}
+	rc=start_software_install_thread();
+	if(rc != SR_ERR_OK)
+	{
+		printf("software_install_thread_fail\n");
 	}
 	return 0;
 }

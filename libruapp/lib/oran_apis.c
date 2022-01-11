@@ -48,6 +48,18 @@ char *sw_dl_password=NULL;
 char sw_dl_remote_path[MAX_PATH_LEN]={0};
 int software_dl_flag=0;
 
+/*
+   variables for software-install
+*/
+
+int software_install_flag=0;
+
+const char *sw_install_path="/o-ran-software-management:install-event";
+const char *sw_install_node_path[]={"slot-name","status","error-message"};
+char **files_to_install={NULL};
+char *dest;
+char *slot_name_to_install={NULL};
+
 	void
 print_val(const notification_val_t *value)
 {
@@ -290,31 +302,131 @@ end:
 	return 0;
 }
 
+
+void *software_install_thread(void *arg)
+{
+	int rc=0;
+	int i=0;
+	char *error=NULL;
+	while(1)
+	{
+		if(software_install_flag)
+		{
+			while(files_to_install[i]!=NULL)
+			{
+//				printf("==>%s\n",dest);
+				rc=sw_install(files_to_install[i],dest,&error[0]);
+
+				if(rc!=0)
+				{
+
+				const char *node_val[]={slot_name_to_install,"INTEGRITY_ERROR",error};
+				ps5g_mplane_send_notification(oran_srv.sr_sess,sw_install_path,sw_install_node_path,node_val,3);
+					free(error);
+					break;
+				}
+					i++;
+					free(files_to_install[i]);
+			}
+			if(files_to_install[i]==NULL)
+			{
+
+				const char *node_val[]={slot_name_to_install,"COMPLETED"};
+				ps5g_mplane_send_notification(oran_srv.sr_sess,sw_install_path,sw_install_node_path,node_val,2);
+			}
+
+			software_install_flag=0;
+		free(files_to_install);
+		}
+		else
+			usleep(1000);
+	}
+
+}
+
+
+int
+sw_install_accept(char *filename,char *slot_name)
+{
+	printf("====>slot_name-%s\n",slot_name);
+	struct stat buffer;
+	int exist = stat(filename,&buffer);
+    if(exist == 0){
+	printf("zip file exist\n");
+        return 0;
+    }
+    else {
+	printf("zip file doesn't  exist\n");
+
+        return 1;
+    }
+
+}
+
 	int
 ps5g_mplane_software_install(ru_sw_pkg_in_t *in,
 		ru_sw_pkg_out_t **out)
 {
-	int rc = 0;
+	int rc = 0,i=0;
 	ru_sw_pkg_out_t *output = NULL;
-
-	printf("Install from slot: %s\n", in->sw_install_in.slot_name);
+	files_to_install=NULL;
+	printf("Install from slot: %s  %s\n", in->sw_install_in.slot_name,in->sw_install_in.file_names[0]);
 
 	output = malloc(sizeof(ru_sw_pkg_out_t));
 	output->type = in->type;
 
-	/* assume start process failed */
-	rc = -1;
-	if(rc == -1)
+	char filename[MAX_PATH_LEN]={0};
+//	sprintf(filename,"%s/%s",SW_MGMT_PATH,in->sw_install_in.file_names[0]);
+	while(in->sw_install_in.file_names[i]!=NULL)
+	{
+	sprintf(filename,"%s/%s",SW_MGMT_PATH,in->sw_install_in.file_names[i]);
+	rc=sw_install_accept(filename,in->sw_install_in.slot_name);
+	if(rc ==1)
 	{
 		output->sw_install_out.status = FAILED;
-		output->sw_install_out.error_message = strdup("Failed to start software installation");
+		output->sw_install_out.error_message = strdup("File doesn't exist");
+		goto error;
+
 	}
-	else
+	i++;
+	}
+	i=0;
+	while(in->sw_install_in.file_names[i]!=NULL)
 	{
-		output->sw_install_out.status = STARTED;
+	sprintf(filename,"%s/%s",SW_MGMT_PATH,in->sw_install_in.file_names[i]);
+
+	files_to_install=(char**)realloc(files_to_install,(i*sizeof(char*)));
+	files_to_install[i]=strdup(filename);
+	i++;
 	}
+	files_to_install[i]=NULL;
+
+	char *slotnames=SW_SLOT2_NAME;
+	if(strstr(slotnames,in->sw_install_in.slot_name)==0)
+	{
+	printf("error in slot available %s required %s\n",in->sw_install_in.slot_name,slotnames);
+	output->sw_install_out.status = FAILED;
+	output->sw_install_out.error_message=strdup("invalid slot");
+	*out = output;
+	free(files_to_install);
+		return 0;
+	}
+	else{
+		if(!strcmp(SW_SLOT2_NAME,in->sw_install_in.slot_name))
+			dest=strdup(SW_SLOT2_PATH);
+
+	slot_name_to_install=strdup(in->sw_install_in.slot_name);
+	output->sw_install_out.status = STARTED;
+	software_install_flag=1;
+	*out = output;
+	}
+
+	return 0;
+error:
+
 	*out = output;
 	return 0;
+
 }
 
 	int
@@ -1593,8 +1705,15 @@ int ps5g_mp_copy_config_to_startup(sr_session_ctx_t *session,const char *module_
 
 int ps5g_mp_data_population(sr_session_ctx_t *session, RuntimeConfig* config)
 {
-		 sr_val_t *vals=NULL;
+
+				sr_val_t *vals=NULL;
 				int rc = SR_ERR_OK;
+				rc=ps5g_mplane_set_operational_data(session,PRODUCT_NAME,"HPRU");
+				if(rc!=SR_ERR_OK)
+					printf("product code has been set HPRU\n");
+				else
+					printf("producet code set success\n");
+
 				rc=ps5g_mplane_get_operational_data(session,T2A_MIN_UP,&vals);
 				if(rc==SR_ERR_OK)
 					 {

@@ -1,0 +1,24 @@
+<software-inventory xmlns="urn:o-ran:software-management:1.0">
+   <software-slot>
+     <name>SOFTWARE_SLOT1_RUNNING</name>
+     <status>VALID</status>
+     <active>true</active>
+     <running>true</running>
+     <access>READ_ONLY</access>
+     <vendor-code>SW</vendor-code>
+     <build-id>sw</build-id>
+     <build-name>sunwave crossfire</build-name>
+     <build-version>V1.0</build-version>
+   </software-slot>
+   <software-slot>
+     <name>SOFTWARE_SLOT2</name>
+     <status>VALID</status>
+     <active>false</active>
+     <running>false</running>
+     <access>READ_WRITE</access>
+     <vendor-code>SW</vendor-code>
+     <build-id>sw</build-id>
+     <build-name>sunwave crossfire</build-name>
+     <build-version>V1.0</build-version>
+   </software-slot>
+</software-inventory>

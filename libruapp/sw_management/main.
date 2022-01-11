@@ -1,0 +1,8 @@
+#include"sw_management.h"
+
+int main(void)
+{
+
+sw_install("/home/workspace/ps5g_ru_release.zip");
+return 0;
+}

@@ -16,6 +16,7 @@
 #include "config.h"
 #endif
 
+#include "sw_management.h"
 #include<pthread.h>
 #include <inttypes.h>
 #include <string.h>
@@ -40,7 +41,6 @@ typedef int bool;
 #include <libssh/sftp.h>
 #include <sys/mman.h>
 
-
 #define SFTP_MAX_RW_SIZE  65536	/*261120 255KB*/
 
 #define DEBUG 1
@@ -55,7 +55,15 @@ struct oran_serv {
 extern struct oran_serv oran_srv;
 #define SW_MGMT_PATH "/home/user/PureSoftware/MP_3.0/software_management"
 
+#define SW_SLOT2_NAME "SOFTWARE_SLOT2"
+
+#define SW_SLOT2_PATH "/home/user/PureSoftware/MP_3.0/software_management/slot2"
+
+
+
 ///xpath defination for reading data from sysrepo 
+
+#define PRODUCT_NAME "/ietf-hardware:hardware/component[name='PS']/o-ran-hardware:product-code"
 
 #define T2A_MAX_UP "/o-ran-delay-management:delay-management/bandwidth-scs-delay-state[bandwidth=400000][subcarrier-spacing=120000]/ru-delay-profile/t2a-max-up"
 
@@ -538,6 +546,7 @@ extern void *file_download_thread(void *);
 extern void *file_upload_thread(void *);
 
 extern void *software_download_thread(void *);
+extern void *software_install_thread(void *);
 
 extern int ps5g_mplane_change_notification(modified_data_t *in, int count);
 extern int ps5g_mplane_software_download(ru_sw_pkg_in_t *in, ru_sw_pkg_out_t **out);
